@@ -46,6 +46,9 @@ public class FreecamModule extends Module {
         }
         if (client.levelRenderer != null) {
             client.levelRenderer.clearVisibleSections();
+            if (client.levelRenderer.sectionOcclusionGraph() != null) {
+                client.levelRenderer.sectionOcclusionGraph().invalidate();
+            }
         }
     }
 
@@ -62,6 +65,9 @@ public class FreecamModule extends Module {
         }
         if (client.levelRenderer != null) {
             client.levelRenderer.clearVisibleSections();
+            if (client.levelRenderer.sectionOcclusionGraph() != null) {
+                client.levelRenderer.sectionOcclusionGraph().invalidate();
+            }
         }
     }
 

@@ -55,6 +55,7 @@ public abstract class CameraMixin {
         FreecamModule freecam = FreecamModule.getInstance();
         if (freecam != null && freecam.isEnabled()) {
             cameraRenderState.isFirstPerson = false;
+            cameraRenderState.smartCull = false;
         }
     }
 }

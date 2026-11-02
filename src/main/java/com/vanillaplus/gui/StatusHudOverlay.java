@@ -11,11 +11,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StatusHudOverlay implements HudElement {
     private final ModuleManager moduleManager;
+    private final Map<String, Float> animationProgress = new ConcurrentHashMap<>();
+    private long lastFrameTime = System.currentTimeMillis();
 
     public StatusHudOverlay(ModuleManager moduleManager) {
         this.moduleManager = moduleManager;
@@ -33,14 +36,29 @@ public class StatusHudOverlay implements HudElement {
             return;
         }
 
-        List<Module> activeModules = new ArrayList<>();
-        for (Module m : moduleManager.getModules()) {
+        long now = System.currentTimeMillis();
+        float deltaSeconds = Math.clamp((now - lastFrameTime) / 1000.0f, 0.001f, 0.1f);
+        lastFrameTime = now;
+
+        float animSpeed = 4.0f;
+
+        Collection<Module> allModules = moduleManager.getModules();
+        for (Module m : allModules) {
+            float current = animationProgress.getOrDefault(m.getId(), 0.0f);
             if (m.isEnabled()) {
-                activeModules.add(m);
+                current = Math.min(1.0f, current + deltaSeconds * animSpeed);
+            } else {
+                current = Math.max(0.0f, current - deltaSeconds * animSpeed);
+            }
+
+            if (current <= 0.001f && !m.isEnabled()) {
+                animationProgress.remove(m.getId());
+            } else {
+                animationProgress.put(m.getId(), current);
             }
         }
 
-        if (activeModules.isEmpty()) {
+        if (animationProgress.isEmpty()) {
             return;
         }
 
@@ -48,17 +66,33 @@ public class StatusHudOverlay implements HudElement {
         int screenWidth = extractor.guiWidth();
         int y = 6;
 
-        for (Module module : activeModules) {
+        for (Module module : allModules) {
+            Float progress = animationProgress.get(module.getId());
+            if (progress == null || progress <= 0.001f) {
+                continue;
+            }
+
+            float eased = 1.0f - (float) Math.pow(1.0f - progress, 3);
+
             String name = module.getName();
             int textWidth = font.width(name);
-            int x = screenWidth - textWidth - 8;
+            int baseTargetX = screenWidth - textWidth - 8;
 
-            extractor.fill(x - 4, y - 2, screenWidth - 4, y + 10, 0x90000000);
-            extractor.fill(screenWidth - 4, y - 2, screenWidth - 2, y + 10, 0xFF44FF44);
+            int slideOffset = (int) ((1.0f - eased) * 35.0f);
+            int x = baseTargetX + slideOffset;
 
-            extractor.text(font, Component.literal(name), x, y, 0xFF55FF55, true);
+            int alpha = (int) (eased * 255.0f);
+            int bgAlpha = (int) (eased * 0x90);
 
-            y += 13;
+            int bgColor = (bgAlpha << 24);
+            int borderColor = (alpha << 24) | 0x0044FF44;
+            int textColor = (alpha << 24) | 0x0055FF55;
+
+            extractor.fill(x - 4, y - 2, screenWidth - 4 + slideOffset, y + 10, bgColor);
+            extractor.fill(screenWidth - 4 + slideOffset, y - 2, screenWidth - 2 + slideOffset, y + 10, borderColor);
+            extractor.text(font, Component.literal(name), x, y, textColor, true);
+
+            y += (int) (13 * eased);
         }
     }
 }
