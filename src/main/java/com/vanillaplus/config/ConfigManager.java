@@ -3,6 +3,8 @@ package com.vanillaplus.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +12,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
+@NullMarked
 public class ConfigManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger("VanillaPlus/Config");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger LOGGER = Objects.requireNonNull(LoggerFactory.getLogger("VanillaPlus/Config"));
+    private static final Gson GSON = Objects.requireNonNull(new GsonBuilder().setPrettyPrinting().create());
     private static final File CONFIG_FILE = new File(
             FabricLoader.getInstance().getConfigDir().toFile(),
             "vanillaplus.json");
@@ -33,6 +37,7 @@ public class ConfigManager {
         }
 
         try (FileReader reader = new FileReader(CONFIG_FILE)) {
+            @Nullable
             ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
             if (loaded != null) {
                 config = loaded;
@@ -46,7 +51,7 @@ public class ConfigManager {
     public static void save() {
         try {
             File parent = CONFIG_FILE.getParentFile();
-            if (!parent.exists()) {
+            if (parent != null && !parent.exists()) {
                 parent.mkdirs();
             }
 

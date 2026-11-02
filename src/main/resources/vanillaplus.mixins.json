@@ -6,7 +6,6 @@
     "client": [
         "CameraMixin",
         "EntityMixin",
-        "FishingHookAccessor",
         "GameRendererMixin",
         "LightmapRenderStateExtractorMixin",
         "LocalPlayerMixin",

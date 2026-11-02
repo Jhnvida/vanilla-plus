@@ -31,9 +31,6 @@ public class ModConfig {
     public int autoToolMinDurability = 5;
     public boolean autoToolSwitchBack = true;
 
-    public boolean autoFishEnabled = false;
-    public int autoFishRecastDelayMs = 600;
-
     public boolean autoRefillEnabled = false;
 
     public boolean fullbrightEnabled = false;

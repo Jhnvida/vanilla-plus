@@ -6,15 +6,18 @@ import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleCategory;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class LightLevelOverlayModule extends Module {
-    private static LightLevelOverlayModule instance;
+    private static @Nullable LightLevelOverlayModule instance;
 
     public LightLevelOverlayModule() {
         super("light_level_overlay", "Light Level",
@@ -22,7 +25,7 @@ public class LightLevelOverlayModule extends Module {
         instance = this;
     }
 
-    public static LightLevelOverlayModule getInstance() {
+    public static @Nullable LightLevelOverlayModule getInstance() {
         return instance;
     }
 
@@ -31,12 +34,14 @@ public class LightLevelOverlayModule extends Module {
             return;
 
         Minecraft client = Minecraft.getInstance();
-        if (client.player == null || client.level == null)
+        LocalPlayer player = client.player;
+        ClientLevel level = client.level;
+        if (player == null || level == null)
             return;
 
         ModConfig config = ConfigManager.getConfig();
         int radius = Math.clamp(config.lightLevelOverlayRadius, 4, 24);
-        BlockPos playerPos = client.player.blockPosition();
+        BlockPos playerPos = player.blockPosition();
 
         BlockPos.MutableBlockPos candidate = new BlockPos.MutableBlockPos();
 
@@ -47,19 +52,19 @@ public class LightLevelOverlayModule extends Module {
 
                 for (int y = -4; y <= 4; y++) {
                     candidate.set(playerPos.getX() + x, playerPos.getY() + y, playerPos.getZ() + z);
-                    BlockState airState = client.level.getBlockState(candidate);
+                    BlockState airState = level.getBlockState(candidate);
 
                     if (!airState.isAir())
                         continue;
 
                     BlockPos belowPos = candidate.below();
-                    BlockState groundState = client.level.getBlockState(belowPos);
+                    BlockState groundState = level.getBlockState(belowPos);
 
-                    if (!groundState.isFaceSturdy(client.level, belowPos, Direction.UP))
+                    if (!groundState.isFaceSturdy(level, belowPos, Direction.UP))
                         continue;
 
-                    int blockLight = client.level.getBrightness(LightLayer.BLOCK, candidate);
-                    int skyLight = client.level.getBrightness(LightLayer.SKY, candidate);
+                    int blockLight = level.getBrightness(LightLayer.BLOCK, candidate);
+                    int skyLight = level.getBrightness(LightLayer.SKY, candidate);
 
                     if (blockLight == 0) {
                         int color;

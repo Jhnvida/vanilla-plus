@@ -56,11 +56,11 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setSaveConsumer(newValue -> config.autoBreedIntervalMs = newValue)
                                 .build());
 
-                automation.addEntry(
-                                entryBuilder.startBooleanToggle(Component.literal("Procriar Vacas"), config.breedCows)
-                                                .setDefaultValue(true)
-                                                .setSaveConsumer(newValue -> config.breedCows = newValue)
-                                                .build());
+                automation.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Procriar Vacas"), config.breedCows)
+                                .setDefaultValue(true)
+                                .setSaveConsumer(newValue -> config.breedCows = newValue)
+                                .build());
 
                 automation.addEntry(entryBuilder
                                 .startBooleanToggle(Component.literal("Procriar Ovelhas"), config.breedSheep)
@@ -68,11 +68,11 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setSaveConsumer(newValue -> config.breedSheep = newValue)
                                 .build());
 
-                automation.addEntry(
-                                entryBuilder.startBooleanToggle(Component.literal("Procriar Porcos"), config.breedPigs)
-                                                .setDefaultValue(true)
-                                                .setSaveConsumer(newValue -> config.breedPigs = newValue)
-                                                .build());
+                automation.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Procriar Porcos"), config.breedPigs)
+                                .setDefaultValue(true)
+                                .setSaveConsumer(newValue -> config.breedPigs = newValue)
+                                .build());
 
                 automation.addEntry(entryBuilder
                                 .startBooleanToggle(Component.literal("Procriar Galinhas"), config.breedChickens)
@@ -161,23 +161,6 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setDefaultValue(true)
                                 .setTooltip(Component.literal("Restaura o item que estava na mão ao parar de minerar"))
                                 .setSaveConsumer(newValue -> config.autoToolSwitchBack = newValue)
-                                .build());
-
-                if (KeybindManager.getToggleAutoFishKey() != null) {
-                        automation.addEntry(entryBuilder
-                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Fish"),
-                                                        KeybindManager.getToggleAutoFishKey())
-                                        .build());
-                }
-
-                automation.addEntry(entryBuilder
-                                .startIntField(Component.literal("Delay de Relançamento (ms)"),
-                                                config.autoFishRecastDelayMs)
-                                .setDefaultValue(600)
-                                .setMin(200)
-                                .setMax(2000)
-                                .setTooltip(Component.literal("Tempo de espera antes de lançar a vara novamente"))
-                                .setSaveConsumer(newValue -> config.autoFishRecastDelayMs = newValue)
                                 .build());
 
                 if (KeybindManager.getToggleAutoRefillKey() != null) {

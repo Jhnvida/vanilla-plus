@@ -5,6 +5,9 @@ import com.vanillaplus.config.ModConfig;
 import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -23,7 +26,10 @@ import net.minecraft.world.level.block.BeetrootBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class AutoReplantModule extends Module {
     private long lastHarvestTime = 0;
 
@@ -44,7 +50,10 @@ public class AutoReplantModule extends Module {
 
     @Override
     public void onClientTick(Minecraft client) {
-        if (client.player == null || client.level == null || client.gameMode == null) {
+        LocalPlayer player = client.player;
+        ClientLevel level = client.level;
+        MultiPlayerGameMode gameMode = client.gameMode;
+        if (player == null || level == null || gameMode == null) {
             return;
         }
 
@@ -60,18 +69,18 @@ public class AutoReplantModule extends Module {
         }
 
         int radius = (int) Math.ceil(config.autoReplantRadius);
-        BlockPos playerPos = client.player.blockPosition();
+        BlockPos playerPos = player.blockPosition();
 
         for (int x = -radius; x <= radius; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -radius; z <= radius; z++) {
                     BlockPos targetPos = playerPos.offset(x, y, z);
                     if (targetPos.distSqr(playerPos) <= config.autoReplantRadius * config.autoReplantRadius) {
-                        BlockState state = client.level.getBlockState(targetPos);
+                        BlockState state = level.getBlockState(targetPos);
                         if (isTargetCropMature(state, config)) {
                             Item seed = getRequiredSeed(state.getBlock());
-                            if (seed != null && hasSeedInInventory(client, seed)) {
-                                harvestAndReplant(client, targetPos, seed);
+                            if (seed != null && hasSeedInInventory(player, seed)) {
+                                harvestAndReplant(player, gameMode, targetPos, seed);
                                 lastHarvestTime = now;
                                 return;
                             }
@@ -88,7 +97,9 @@ public class AutoReplantModule extends Module {
         }
 
         Minecraft client = Minecraft.getInstance();
-        if (client.player != player) {
+        LocalPlayer localPlayer = client.player;
+        MultiPlayerGameMode gameMode = client.gameMode;
+        if (localPlayer == null || localPlayer != player || gameMode == null) {
             return InteractionResult.PASS;
         }
 
@@ -98,8 +109,8 @@ public class AutoReplantModule extends Module {
 
         if (isTargetCropMature(state, config)) {
             Item seed = getRequiredSeed(state.getBlock());
-            if (seed != null && hasSeedInInventory(client, seed)) {
-                harvestAndReplant(client, pos, seed);
+            if (seed != null && hasSeedInInventory(localPlayer, seed)) {
+                harvestAndReplant(localPlayer, gameMode, pos, seed);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -107,10 +118,7 @@ public class AutoReplantModule extends Module {
         return InteractionResult.PASS;
     }
 
-    private void harvestAndReplant(Minecraft client, BlockPos pos, Item seed) {
-        if (client.gameMode == null || client.player == null)
-            return;
-
+    private void harvestAndReplant(LocalPlayer player, MultiPlayerGameMode gameMode, BlockPos pos, Item seed) {
         BlockHitResult farmHit = new BlockHitResult(
                 new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5),
                 Direction.UP,
@@ -118,17 +126,17 @@ public class AutoReplantModule extends Module {
                 false);
 
         InteractionHand hand = InteractionHand.MAIN_HAND;
-        int previousSlot = client.player.getInventory().getSelectedSlot();
+        int previousSlot = player.getInventory().getSelectedSlot();
         boolean swapped = false;
 
-        if (client.player.getMainHandItem().is(seed)) {
+        if (player.getMainHandItem().is(seed)) {
             hand = InteractionHand.MAIN_HAND;
-        } else if (client.player.getOffhandItem().is(seed)) {
+        } else if (player.getOffhandItem().is(seed)) {
             hand = InteractionHand.OFF_HAND;
         } else {
             for (int i = 0; i < 9; i++) {
-                if (client.player.getInventory().getItem(i).is(seed)) {
-                    client.player.getInventory().setSelectedSlot(i);
+                if (player.getInventory().getItem(i).is(seed)) {
+                    player.getInventory().setSelectedSlot(i);
                     swapped = true;
                     hand = InteractionHand.MAIN_HAND;
                     break;
@@ -136,13 +144,13 @@ public class AutoReplantModule extends Module {
             }
         }
 
-        client.gameMode.startDestroyBlock(pos, Direction.UP);
+        gameMode.startDestroyBlock(pos, Direction.UP);
 
-        client.gameMode.useItemOn(client.player, hand, farmHit);
-        client.player.swing(hand, new ItemStack(seed).getInteractAnimation(), true);
+        gameMode.useItemOn(player, hand, farmHit);
+        player.swing(hand, new ItemStack(seed).getInteractAnimation(), true);
 
         if (swapped) {
-            client.player.getInventory().setSelectedSlot(previousSlot);
+            player.getInventory().setSelectedSlot(previousSlot);
         }
     }
 
@@ -165,7 +173,7 @@ public class AutoReplantModule extends Module {
         return false;
     }
 
-    public static Item getRequiredSeed(Block block) {
+    public static @Nullable Item getRequiredSeed(Block block) {
         if (block == Blocks.WHEAT)
             return Items.WHEAT_SEEDS;
         if (block == Blocks.CARROTS)
@@ -177,9 +185,7 @@ public class AutoReplantModule extends Module {
         return null;
     }
 
-    private boolean hasSeedInInventory(Minecraft client, Item seed) {
-        if (client.player == null)
-            return false;
-        return client.player.getInventory().contains(new ItemStack(seed));
+    private boolean hasSeedInInventory(LocalPlayer player, Item seed) {
+        return player.getInventory().contains(new ItemStack(seed));
     }
 }

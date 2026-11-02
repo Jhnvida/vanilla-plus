@@ -38,7 +38,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Arquitetura Modular Desacoplada:** Estruturado no padrão de módulos autônomos (`Module`), gerenciados centralmente por um `ModuleManager` que orquestra o ciclo de vida e o despacho de ticks de forma otimizada.
 - **Prevenção de Abuso e Anti-Ban:** Mecanismos rigorosos de controle de taxa de interação (*rate limiting*) e interceptação via Mixins para bloquear o envio de pacotes suspeitos de posicionamento durante o uso de câmera livre.
 - **Configuração Atômica e Visual:** Integração nativa com a Cloth Config API e o catálogo ModMenu, permitindo ajustes em tempo real com persistência atômica em formato JSON (`.minecraft/config/vanillaplus.json`).
-- **Overlay HUD Animado:** Interface visual no canto superior com animação fluida (slide e fade com interpolação cúbica) para indicar em tempo real quais módulos estão ativos.
+- **Overlay HUD Minimalista e Animado:** Interface visual no canto superior com animação fluida (slide e fade com interpolação cúbica), ordenação inteligente por tamanho de texto e destaque sutil de modos ativos.
 
 ---
 
@@ -48,7 +48,6 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Auto Replant & Right-Click Harvest:** Colheita e replantio atômico de plantações maduras com preservação da terra arada e suporte a varredura por proximidade.
 - **Freecam Segura e Suave:** Desacoplamento da câmera com movimentação tridimensional livre, rotação precisa pelo mouse e supressão de pacotes anômalos.
 - **Auto Tool com Proteção:** Troca dinâmica para a ferramenta mais rápida da hotbar para o bloco minerado, poupando ferramentas com durabilidade crítica.
-- **Auto Fish:** Detecção automática de fisgada na boia e recolhimento/relançamento contínuo da linha de pesca.
 - **Auto Refill:** Reposição instantânea de itens ou blocos consumidos na hotbar diretamente do inventário do jogador.
 - **Fullbright:** Iluminação nítida para exploração subterrânea sem alteração de pacotes no servidor.
 - **Light Level Overlay:** Marcadores no chão indicando condições de luz propícias para o surgimento de monstros hostis.
@@ -62,7 +61,6 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Auto Breed:** Alimenta animais adultos (Vacas, Coguvacas, Ovelhas, Porcos e Galinhas) dentro do raio configurado respeitando intervalos de cooldown.
 - **Auto Replant:** Colhe e replanta Trigo, Cenoura, Batata e Beterraba mantendo o solo arado hidratado.
 - **Auto Tool:** Avalia o bloco em quebra e ativa automaticamente a ferramenta ideal da barra de acesso rápido, com limite configurável de durabilidade mínima e retorno ao slot original.
-- **Auto Fish:** Monitora fisicamente e via synched data a puxada da boia na água, recolhendo e relançando a linha após intervalo ajustável.
 - **Auto Refill:** Detecta o esgotamento do stack selecionado na hotbar e puxa automaticamente o próximo lote correspondente do inventário.
 
 ### 2. Movimentação & Câmera (`movement`)
@@ -120,14 +118,13 @@ vanilla-plus/
 │   │   │   │   ├── ModuleCategory.java # Categorias de agrupamento dos módulos
 │   │   │   │   └── ModuleManager.java  # Registro singleton e despachante de ticks
 │   │   │   ├── gui/                    # Interfaces e sobreposições visuais
-│   │   │   │   ├── StatusHudOverlay.java      # HUD animado dos módulos ativos
+│   │   │   │   ├── StatusHudOverlay.java      # HUD minimalista animado dos módulos
 │   │   │   │   └── VanillaPlusModMenuApi.java # Conexão com ModMenu e Cloth Config
 │   │   │   ├── keybinds/               # Gerenciamento de atalhos e teclado
 │   │   │   │   └── KeybindManager.java # Registro de teclas no KeyMappingHelper
 │   │   │   ├── mixin/                  # Injeções de bytecode seguras via Mixins
 │   │   │   │   ├── CameraMixin.java    # Interceptação e desacoplamento da câmera
 │   │   │   │   ├── EntityMixin.java    # Rotação pelo mouse na Freecam
-│   │   │   │   ├── FishingHookAccessor.java   # Acesso ao estado de fisgada da boia
 │   │   │   │   ├── GameRendererMixin.java     # Supressão de renderização da mão
 │   │   │   │   ├── LightmapRenderStateExtractorMixin.java # Suporte ao Fullbright
 │   │   │   │   ├── LocalPlayerMixin.java      # Supressão de pacotes durante Freecam
@@ -135,7 +132,6 @@ vanilla-plus/
 │   │   │   ├── modules/                # Módulos funcionais do mod
 │   │   │   │   ├── automation/         # Módulos de automação de tarefas
 │   │   │   │   │   ├── AutoBreedModule.java   # Reprodução inteligente de animais
-│   │   │   │   │   ├── AutoFishModule.java    # Pesca automatizada contínua
 │   │   │   │   │   ├── AutoRefillModule.java  # Reposição de itens na hotbar
 │   │   │   │   │   ├── AutoReplantModule.java # Colheita e replantio de culturas
 │   │   │   │   │   └── AutoToolModule.java    # Seleção inteligente de ferramentas
@@ -146,7 +142,7 @@ vanilla-plus/
 │   │   │   │       └── LightLevelOverlayModule.java # Indicador de níveis de luz
 │   │   │   └── VanillaPlusClientMod.java      # Ponto de entrada (ClientModInitializer)
 │   │   └── resources/
-│   │       ├── assets/vanillaplus/     # Texturas, ícone e recursos visuais
+│   │       ├── assets/vanillaplus/     # Texturas, ícone e recursos de internacionalização
 │   │       ├── fabric.mod.json         # Manifesto e metadados do Fabric Loader
 │   │       └── vanillaplus.mixins.json # Configuração de injeção dos Mixins
 │   └── test/java/com/vanillaplus/      # Bateria de testes unitários automatizados
@@ -239,7 +235,6 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
 | **Alternar Auto Breed** | `B` | Ativa ou suspende a alimentação automática de animais na fazenda. |
 | **Alternar Auto Replant** | `R` | Ativa ou suspende a colheita e replantio atômico de plantações. |
 | **Alternar Auto Tool** | `G` | Ativa ou suspende a seleção automática de ferramentas ao minerar. |
-| **Alternar Auto Fish** | `K` | Ativa ou suspende a pesca contínua automatizada. |
 | **Alternar Auto Refill** | `J` | Ativa ou suspende a reposição automática de stacks na hotbar. |
 | **Alternar Fullbright** | `H` | Ativa ou desativa a iluminação noturna clara no ambiente. |
 | **Alternar Light Level** | `F7` | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs. |

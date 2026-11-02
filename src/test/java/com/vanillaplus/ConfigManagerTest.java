@@ -18,7 +18,6 @@ public class ConfigManagerTest {
         assertFalse(config.autoReplantEnabled, "AutoReplant deve iniciar desativado");
         assertFalse(config.freecamEnabled, "Freecam deve iniciar desativado");
         assertFalse(config.autoToolEnabled, "AutoTool deve iniciar desativado");
-        assertFalse(config.autoFishEnabled, "AutoFish deve iniciar desativado");
         assertFalse(config.autoRefillEnabled, "AutoRefill deve iniciar desativado");
         assertFalse(config.fullbrightEnabled, "Fullbright deve iniciar desativado");
         assertFalse(config.lightLevelOverlayEnabled, "LightLevelOverlay deve iniciar desativado");
@@ -29,6 +28,5 @@ public class ConfigManagerTest {
         assertEquals(1.0f, config.freecamSpeed, 0.01f, "Velocidade padrão do Freecam deve ser 1.0");
         assertTrue(config.autoToolProtectDurability, "Proteção de durabilidade do AutoTool deve vir ativa por padrão");
         assertTrue(config.autoToolMinDurability >= 1, "Durabilidade mínima do AutoTool deve ser maior ou igual a 1");
-        assertTrue(config.autoFishRecastDelayMs >= 200, "Delay de relançamento do AutoFish deve ser seguro");
     }
 }

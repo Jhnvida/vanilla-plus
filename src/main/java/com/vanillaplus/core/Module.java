@@ -1,7 +1,9 @@
 package com.vanillaplus.core;
 
 import net.minecraft.client.Minecraft;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class Module {
     private final String id;
     private final String name;

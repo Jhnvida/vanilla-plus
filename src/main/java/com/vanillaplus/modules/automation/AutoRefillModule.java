@@ -3,13 +3,18 @@ package com.vanillaplus.modules.automation;
 import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class AutoRefillModule extends Module {
-    private static AutoRefillModule instance;
-    private Item lastHeldItem = null;
+    private static @Nullable AutoRefillModule instance;
+    private @Nullable Item lastHeldItem = null;
     private int lastSelectedSlot = -1;
 
     public AutoRefillModule() {
@@ -18,30 +23,33 @@ public class AutoRefillModule extends Module {
         instance = this;
     }
 
-    public static AutoRefillModule getInstance() {
+    public static @Nullable AutoRefillModule getInstance() {
         return instance;
     }
 
     @Override
     public void onClientTick(Minecraft client) {
-        if (client.player == null || client.gameMode == null || client.player.inventoryMenu == null) {
+        LocalPlayer player = client.player;
+        MultiPlayerGameMode gameMode = client.gameMode;
+        if (player == null || gameMode == null) {
             lastHeldItem = null;
             lastSelectedSlot = -1;
             return;
         }
 
-        int currentSlot = client.player.getInventory().getSelectedSlot();
-        ItemStack currentStack = client.player.getInventory().getItem(currentSlot);
+        int currentSlot = player.getInventory().getSelectedSlot();
+        ItemStack currentStack = player.getInventory().getItem(currentSlot);
 
-        if (currentSlot == lastSelectedSlot && lastHeldItem != null && currentStack.isEmpty()) {
-            int refillSlot = findMatchingInventorySlot(client, lastHeldItem);
+        Item itemToRefill = lastHeldItem;
+        if (currentSlot == lastSelectedSlot && itemToRefill != null && currentStack.isEmpty()) {
+            int refillSlot = findMatchingInventorySlot(player, itemToRefill);
             if (refillSlot != -1) {
-                client.gameMode.handleContainerInput(
-                        client.player.inventoryMenu.containerId,
+                gameMode.handleContainerInput(
+                        player.inventoryMenu.containerId,
                         refillSlot,
                         currentSlot,
                         ContainerInput.SWAP,
-                        client.player);
+                        player);
             }
         }
 
@@ -49,9 +57,9 @@ public class AutoRefillModule extends Module {
         lastHeldItem = currentStack.isEmpty() ? null : currentStack.getItem();
     }
 
-    private int findMatchingInventorySlot(Minecraft client, Item item) {
+    private int findMatchingInventorySlot(LocalPlayer player, Item item) {
         for (int i = 9; i <= 35; i++) {
-            ItemStack stack = client.player.inventoryMenu.getSlot(i).getItem();
+            ItemStack stack = player.inventoryMenu.getSlot(i).getItem();
             if (!stack.isEmpty() && stack.getItem() == item) {
                 return i;
             }

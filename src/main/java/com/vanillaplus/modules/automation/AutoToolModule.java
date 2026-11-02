@@ -5,13 +5,19 @@ import com.vanillaplus.config.ModConfig;
 import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class AutoToolModule extends Module {
-    private static AutoToolModule instance;
+    private static @Nullable AutoToolModule instance;
     private int previousSlot = -1;
     private boolean isSwapped = false;
 
@@ -21,13 +27,16 @@ public class AutoToolModule extends Module {
         instance = this;
     }
 
-    public static AutoToolModule getInstance() {
+    public static @Nullable AutoToolModule getInstance() {
         return instance;
     }
 
     @Override
     public void onClientTick(Minecraft client) {
-        if (client.player == null || client.level == null || client.gameMode == null) {
+        LocalPlayer player = client.player;
+        ClientLevel level = client.level;
+        MultiPlayerGameMode gameMode = client.gameMode;
+        if (player == null || level == null || gameMode == null) {
             return;
         }
 
@@ -35,23 +44,23 @@ public class AutoToolModule extends Module {
 
         if (client.options.keyAttack.isDown() && client.hitResult instanceof BlockHitResult hitResult) {
             BlockPos pos = hitResult.getBlockPos();
-            BlockState state = client.level.getBlockState(pos);
+            BlockState state = level.getBlockState(pos);
 
             if (!state.isAir()) {
-                int bestSlot = findBestToolSlot(client, state, config);
-                int currentSlot = client.player.getInventory().getSelectedSlot();
+                int bestSlot = findBestToolSlot(player, state, config);
+                int currentSlot = player.getInventory().getSelectedSlot();
 
                 if (bestSlot != -1 && bestSlot != currentSlot) {
                     if (!isSwapped) {
                         previousSlot = currentSlot;
                         isSwapped = true;
                     }
-                    client.player.getInventory().setSelectedSlot(bestSlot);
+                    player.getInventory().setSelectedSlot(bestSlot);
                 }
             }
         } else {
             if (isSwapped && config.autoToolSwitchBack && previousSlot != -1) {
-                client.player.getInventory().setSelectedSlot(previousSlot);
+                player.getInventory().setSelectedSlot(previousSlot);
                 isSwapped = false;
                 previousSlot = -1;
             } else if (!client.options.keyAttack.isDown()) {
@@ -61,19 +70,19 @@ public class AutoToolModule extends Module {
         }
     }
 
-    private int findBestToolSlot(Minecraft client, BlockState state, ModConfig config) {
+    private int findBestToolSlot(LocalPlayer player, BlockState state, ModConfig config) {
         int bestSlot = -1;
         float bestSpeed = 1.0f;
 
-        int currentSlot = client.player.getInventory().getSelectedSlot();
-        ItemStack currentStack = client.player.getInventory().getItem(currentSlot);
+        int currentSlot = player.getInventory().getSelectedSlot();
+        ItemStack currentStack = player.getInventory().getItem(currentSlot);
         if (isUsable(currentStack, config)) {
             bestSpeed = currentStack.getDestroySpeed(state);
             bestSlot = currentSlot;
         }
 
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = client.player.getInventory().getItem(i);
+            ItemStack stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || !isUsable(stack, config)) {
                 continue;
             }
@@ -83,7 +92,7 @@ public class AutoToolModule extends Module {
 
             float score = speed + (isCorrectTool ? 100.0f : 0.0f);
             float currentBestScore = bestSpeed
-                    + ((bestSlot != -1 && client.player.getInventory().getItem(bestSlot).isCorrectToolForDrops(state))
+                    + ((bestSlot != -1 && player.getInventory().getItem(bestSlot).isCorrectToolForDrops(state))
                             ? 100.0f
                             : 0.0f);
 

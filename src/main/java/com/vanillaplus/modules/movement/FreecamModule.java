@@ -5,11 +5,15 @@ import com.vanillaplus.config.ModConfig;
 import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class FreecamModule extends Module {
-    private static FreecamModule instance;
+    private static @Nullable FreecamModule instance;
 
     private double cameraX;
     private double cameraY;
@@ -27,22 +31,23 @@ public class FreecamModule extends Module {
         instance = this;
     }
 
-    public static FreecamModule getInstance() {
+    public static @Nullable FreecamModule getInstance() {
         return instance;
     }
 
     @Override
     protected void onEnable() {
         Minecraft client = Minecraft.getInstance();
-        if (client.player != null) {
-            this.cameraX = client.player.getX();
-            this.cameraY = client.player.getEyeY();
-            this.cameraZ = client.player.getZ();
+        LocalPlayer player = client.player;
+        if (player != null) {
+            this.cameraX = player.getX();
+            this.cameraY = player.getEyeY();
+            this.cameraZ = player.getZ();
             this.prevCameraX = cameraX;
             this.prevCameraY = cameraY;
             this.prevCameraZ = cameraZ;
-            this.cameraYaw = client.player.getYRot();
-            this.cameraPitch = client.player.getXRot();
+            this.cameraYaw = player.getYRot();
+            this.cameraPitch = player.getXRot();
         }
         if (client.levelRenderer != null) {
             client.levelRenderer.clearVisibleSections();
@@ -55,10 +60,11 @@ public class FreecamModule extends Module {
     @Override
     protected void onDisable() {
         Minecraft client = Minecraft.getInstance();
-        if (client.player != null) {
-            this.cameraX = client.player.getX();
-            this.cameraY = client.player.getEyeY();
-            this.cameraZ = client.player.getZ();
+        LocalPlayer player = client.player;
+        if (player != null) {
+            this.cameraX = player.getX();
+            this.cameraY = player.getEyeY();
+            this.cameraZ = player.getZ();
             this.prevCameraX = cameraX;
             this.prevCameraY = cameraY;
             this.prevCameraZ = cameraZ;
