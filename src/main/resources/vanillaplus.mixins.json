@@ -1,0 +1,10 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.vanillaplus.mixin",
+    "compatibilityLevel": "JAVA_25",
+    "client": ["CameraMixin", "LocalPlayerMixin"],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

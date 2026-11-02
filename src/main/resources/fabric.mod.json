@@ -1,0 +1,29 @@
+{
+    "schemaVersion": 1,
+    "id": "vanillaplus",
+    "version": "${version}",
+    "name": "VanillaPlus",
+    "description": "Mod leve, modular e personalizavel de Qualidade de Vida (QoL), automacao e exploracao para Minecraft.",
+    "authors": ["VanillaPlus Team"],
+    "contact": {
+        "sources": "https://github.com/vanillaplus/vanillaplus"
+    },
+    "license": "MIT",
+    "icon": "assets/vanillaplus/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": ["com.vanillaplus.VanillaPlusClientMod"],
+        "modmenu": ["com.vanillaplus.gui.VanillaPlusModMenuApi"]
+    },
+    "mixins": ["vanillaplus.mixins.json"],
+    "depends": {
+        "fabricloader": ">=0.19.5",
+        "minecraft": ">=26.3",
+        "java": ">=25",
+        "fabric-api": "*"
+    },
+    "suggests": {
+        "cloth-config": ">=26.3.158",
+        "modmenu": ">=26.3.0"
+    }
+}
