@@ -14,7 +14,7 @@ public class ModConfig {
     public boolean breedChickens = true;
 
     public boolean autoReplantEnabled = false;
-    public boolean rightClickHarvestOnly = true;
+    public boolean rightClickHarvestOnly = false;
     public double autoReplantRadius = 3.0;
     public int autoReplantIntervalMs = 250;
     public boolean replantWheat = true;

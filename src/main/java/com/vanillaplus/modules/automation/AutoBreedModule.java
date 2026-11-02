@@ -13,15 +13,17 @@ import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AutoBreedModule extends Module {
     private long lastBreedTime = 0;
+    private final Map<Integer, Long> fedCooldowns = new ConcurrentHashMap<>();
 
     public AutoBreedModule() {
         super("auto_breed", "Auto Breed", "Alimenta automaticamente animais elegíveis para reprodução nas proximidades",
@@ -37,6 +39,8 @@ public class AutoBreedModule extends Module {
         ModConfig config = ConfigManager.getConfig();
         long now = System.currentTimeMillis();
 
+        fedCooldowns.entrySet().removeIf(entry -> now > entry.getValue());
+
         if (now - lastBreedTime < config.autoBreedIntervalMs) {
             return;
         }
@@ -48,14 +52,22 @@ public class AutoBreedModule extends Module {
                 playerPos.x + range, playerPos.y + range, playerPos.z + range);
 
         List<Animal> nearbyAnimals = client.level.getEntitiesOfClass(Animal.class, searchBox,
-                animal -> isEligible(animal, config, client));
+                animal -> isEligible(animal, config, client, now));
 
         for (Animal animal : nearbyAnimals) {
-            if (animal.distanceToSqr(client.player) <= range * range) {
+            if (animal.distanceToSqr(client.player) <= range * range
+                    && client.player.isWithinEntityInteractionRange(animal, 0.5)) {
                 InteractionHand feedHand = getFoodHand(animal, client);
                 if (feedHand != null) {
-                    client.gameMode.interact(client.player, animal, new EntityHitResult(animal), feedHand);
-                    client.player.swing(feedHand, SwingAnimation.DEFAULT, true);
+                    ItemStack foodStack = (feedHand == InteractionHand.MAIN_HAND)
+                            ? client.player.getMainHandItem()
+                            : client.player.getOffhandItem();
+
+                    Vec3 hitPos = animal.position().add(0, animal.getBbHeight() * 0.5, 0);
+                    client.gameMode.interact(client.player, animal, new EntityHitResult(animal, hitPos), feedHand);
+                    client.player.swing(feedHand, foodStack.getInteractAnimation(), true);
+
+                    fedCooldowns.put(animal.getId(), now + 15000L);
                     lastBreedTime = now;
                     break;
                 }
@@ -63,8 +75,12 @@ public class AutoBreedModule extends Module {
         }
     }
 
-    public boolean isEligible(Animal animal, ModConfig config, Minecraft client) {
-        if (animal == null || animal.isBaby() || animal.getAge() != 0 || animal.isInLove()) {
+    public boolean isEligible(Animal animal, ModConfig config, Minecraft client, long now) {
+        if (animal == null || animal.isBaby()) {
+            return false;
+        }
+
+        if (fedCooldowns.containsKey(animal.getId()) && now <= fedCooldowns.get(animal.getId())) {
             return false;
         }
 
@@ -105,20 +121,23 @@ public class AutoBreedModule extends Module {
         if (stack == null || stack.isEmpty())
             return false;
 
-        if (animal instanceof Cow || animal instanceof Sheep) {
-            return stack.getItem() == Items.WHEAT;
+        if (animal != null) {
+            return animal.isFood(stack);
         }
 
-        if (animal instanceof Pig) {
-            return stack.getItem() == Items.CARROT || stack.getItem() == Items.POTATO
-                    || stack.getItem() == Items.BEETROOT;
-        }
+        return stack.getItem() == Items.WHEAT
+                || stack.getItem() == Items.CARROT
+                || stack.getItem() == Items.POTATO
+                || stack.getItem() == Items.BEETROOT
+                || stack.getItem() == Items.WHEAT_SEEDS
+                || stack.getItem() == Items.BEETROOT_SEEDS
+                || stack.getItem() == Items.MELON_SEEDS
+                || stack.getItem() == Items.PUMPKIN_SEEDS;
+    }
 
-        if (animal instanceof Chicken) {
-            return stack.getItem() == Items.WHEAT_SEEDS || stack.getItem() == Items.BEETROOT_SEEDS ||
-                    stack.getItem() == Items.MELON_SEEDS || stack.getItem() == Items.PUMPKIN_SEEDS;
-        }
-
-        return false;
+    @Override
+    public void onDisconnect() {
+        super.onDisconnect();
+        fedCooldowns.clear();
     }
 }

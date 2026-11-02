@@ -8,10 +8,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -59,7 +61,7 @@ public class AutoReplantModule extends Module {
                         if (isTargetCropMature(state, config)) {
                             Item seed = getRequiredSeed(state.getBlock());
                             if (seed != null && hasSeedInInventory(client, seed)) {
-                                harvestAndReplant(client, targetPos);
+                                harvestAndReplant(client, targetPos, seed);
                                 lastHarvestTime = now;
                                 return;
                             }
@@ -70,38 +72,68 @@ public class AutoReplantModule extends Module {
         }
     }
 
-    public boolean handleRightClick(Minecraft client, BlockHitResult hitResult) {
-        if (!isEnabled() || client.level == null || client.player == null) {
-            return false;
+    public InteractionResult onUseBlock(Player player, Level level, InteractionHand hand, BlockHitResult hitResult) {
+        if (!isEnabled() || !level.isClientSide()) {
+            return InteractionResult.PASS;
+        }
+
+        Minecraft client = Minecraft.getInstance();
+        if (client.player != player) {
+            return InteractionResult.PASS;
         }
 
         ModConfig config = ConfigManager.getConfig();
         BlockPos pos = hitResult.getBlockPos();
-        BlockState state = client.level.getBlockState(pos);
+        BlockState state = level.getBlockState(pos);
 
         if (isTargetCropMature(state, config)) {
             Item seed = getRequiredSeed(state.getBlock());
             if (seed != null && hasSeedInInventory(client, seed)) {
-                harvestAndReplant(client, pos);
-                return true;
+                harvestAndReplant(client, pos, seed);
+                return InteractionResult.SUCCESS;
             }
         }
-        return false;
+
+        return InteractionResult.PASS;
     }
 
-    private void harvestAndReplant(Minecraft client, BlockPos pos) {
+    private void harvestAndReplant(Minecraft client, BlockPos pos, Item seed) {
         if (client.gameMode == null || client.player == null)
             return;
 
-        BlockHitResult hitResult = new BlockHitResult(
-                new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
+        BlockHitResult farmHit = new BlockHitResult(
+                new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5),
                 Direction.UP,
-                pos,
+                pos.below(),
                 false);
 
+        InteractionHand hand = InteractionHand.MAIN_HAND;
+        int previousSlot = client.player.getInventory().getSelectedSlot();
+        boolean swapped = false;
+
+        if (client.player.getMainHandItem().is(seed)) {
+            hand = InteractionHand.MAIN_HAND;
+        } else if (client.player.getOffhandItem().is(seed)) {
+            hand = InteractionHand.OFF_HAND;
+        } else {
+            for (int i = 0; i < 9; i++) {
+                if (client.player.getInventory().getItem(i).is(seed)) {
+                    client.player.getInventory().setSelectedSlot(i);
+                    swapped = true;
+                    hand = InteractionHand.MAIN_HAND;
+                    break;
+                }
+            }
+        }
+
         client.gameMode.startDestroyBlock(pos, Direction.UP);
-        client.gameMode.useItemOn(client.player, InteractionHand.MAIN_HAND, hitResult);
-        client.player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
+
+        client.gameMode.useItemOn(client.player, hand, farmHit);
+        client.player.swing(hand, new ItemStack(seed).getInteractAnimation(), true);
+
+        if (swapped) {
+            client.player.getInventory().setSelectedSlot(previousSlot);
+        }
     }
 
     public static boolean isTargetCropMature(BlockState state, ModConfig config) {

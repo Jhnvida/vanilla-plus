@@ -111,11 +111,6 @@ Permite inspecionar estruturas, terrenos e projetos de engenharia sem alterar o 
 
 ```text
 vanilla-plus/
-├── docs/                               # Documentação técnica e especificações
-│   ├── arquitetura.md                  # Padrões de projeto, ciclo de vida e Mixins
-│   ├── especificacao_refinada.md       # Regras de negócio, restrições e casos de borda
-│   ├── pesquisa_tecnica.md             # Análise de ecossistema e mapeamentos Mojmap
-│   └── TODO.md                         # Backlog e rastreamento de fases
 ├── mappings/                           # Mapeamentos de desenvolvimento
 │   └── mappings-26.3.jar               # Mappings unificados para Minecraft 26.3
 ├── src/

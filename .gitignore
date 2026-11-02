@@ -1,12 +1,22 @@
+# Build e execução
 .gradle/
 build/
 bin/
 out/
 logs/
 run/
+
+# Documentação interna de desenvolvimento
+docs/
+
+# IDEs e editores
 .idea/
 *.iml
 .vscode/
 .settings/
 .classpath
 .project
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

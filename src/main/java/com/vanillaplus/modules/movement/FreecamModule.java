@@ -44,14 +44,30 @@ public class FreecamModule extends Module {
             this.cameraYaw = client.player.getYRot();
             this.cameraPitch = client.player.getXRot();
         }
+        if (client.levelRenderer != null) {
+            client.levelRenderer.clearVisibleSections();
+        }
     }
 
     @Override
     protected void onDisable() {
         Minecraft client = Minecraft.getInstance();
+        if (client.player != null) {
+            this.cameraX = client.player.getX();
+            this.cameraY = client.player.getEyeY();
+            this.cameraZ = client.player.getZ();
+            this.prevCameraX = cameraX;
+            this.prevCameraY = cameraY;
+            this.prevCameraZ = cameraZ;
+        }
         if (client.levelRenderer != null) {
             client.levelRenderer.clearVisibleSections();
         }
+    }
+
+    public void addCameraRotation(float yRot, float xRot) {
+        this.cameraYaw += (float) (yRot * 0.15);
+        this.cameraPitch = Mth.clamp(this.cameraPitch + (float) (xRot * 0.15), -90.0f, 90.0f);
     }
 
     @Override
@@ -64,43 +80,54 @@ public class FreecamModule extends Module {
         this.prevCameraZ = cameraZ;
 
         ModConfig config = ConfigManager.getConfig();
-        float speed = config.freecamSpeed * 0.5f;
+        double speed = Math.max(0.1, config.freecamSpeed * 0.4);
 
-        this.cameraYaw = client.player.getYRot();
-        this.cameraPitch = client.player.getXRot();
+        if (client.options.keySprint.isDown()) {
+            speed *= 2.2;
+        }
 
         float radYaw = (float) Math.toRadians(cameraYaw);
         float radPitch = (float) Math.toRadians(cameraPitch);
 
-        Vec3 forward = new Vec3(-Mth.sin(radYaw) * Mth.cos(radPitch), -Mth.sin(radPitch),
-                Mth.cos(radYaw) * Mth.cos(radPitch)).normalize();
-        Vec3 right = new Vec3(Mth.cos(radYaw), 0, Mth.sin(radYaw)).normalize();
+        Vec3 forward = new Vec3(
+                -Mth.sin(radYaw) * Mth.cos(radPitch),
+                -Mth.sin(radPitch),
+                Mth.cos(radYaw) * Mth.cos(radPitch));
+
+        Vec3 right = new Vec3(
+                -Mth.cos(radYaw),
+                0,
+                -Mth.sin(radYaw));
+
         Vec3 up = new Vec3(0, 1, 0);
 
         Vec3 movement = Vec3.ZERO;
 
         if (client.options.keyUp.isDown()) {
-            movement = movement.add(forward.scale(speed));
+            movement = movement.add(forward);
         }
         if (client.options.keyDown.isDown()) {
-            movement = movement.subtract(forward.scale(speed));
+            movement = movement.subtract(forward);
         }
         if (client.options.keyRight.isDown()) {
-            movement = movement.add(right.scale(speed));
+            movement = movement.add(right);
         }
         if (client.options.keyLeft.isDown()) {
-            movement = movement.subtract(right.scale(speed));
+            movement = movement.subtract(right);
         }
         if (client.options.keyJump.isDown()) {
-            movement = movement.add(up.scale(speed));
+            movement = movement.add(up);
         }
         if (client.options.keyShift.isDown()) {
-            movement = movement.subtract(up.scale(speed));
+            movement = movement.subtract(up);
         }
 
-        this.cameraX += movement.x;
-        this.cameraY += movement.y;
-        this.cameraZ += movement.z;
+        if (movement.lengthSqr() > 0.0001) {
+            movement = movement.normalize().scale(speed);
+            this.cameraX += movement.x;
+            this.cameraY += movement.y;
+            this.cameraZ += movement.z;
+        }
     }
 
     public Vec3 getInterpolatedCameraPos(float tickDelta) {

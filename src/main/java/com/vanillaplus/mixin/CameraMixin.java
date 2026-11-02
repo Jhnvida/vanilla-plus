@@ -3,12 +3,14 @@ package com.vanillaplus.mixin;
 import com.vanillaplus.modules.movement.FreecamModule;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -19,6 +21,16 @@ public abstract class CameraMixin {
     @Shadow
     protected abstract void setRotation(float yaw, float pitch);
 
+    @Inject(method = "alignWithEntity", at = @At("TAIL"))
+    private void onAlignWithEntity(float partialTicks, CallbackInfo ci) {
+        FreecamModule freecam = FreecamModule.getInstance();
+        if (freecam != null && freecam.isEnabled()) {
+            Vec3 targetPos = freecam.getInterpolatedCameraPos(partialTicks);
+            this.setPosition(targetPos);
+            this.setRotation(freecam.getCameraYaw(), freecam.getCameraPitch());
+        }
+    }
+
     @Inject(method = "update", at = @At("TAIL"))
     private void onUpdateCamera(DeltaTracker deltaTracker, CallbackInfo ci) {
         FreecamModule freecam = FreecamModule.getInstance();
@@ -27,6 +39,22 @@ public abstract class CameraMixin {
             Vec3 targetPos = freecam.getInterpolatedCameraPos(tickDelta);
             this.setPosition(targetPos);
             this.setRotation(freecam.getCameraYaw(), freecam.getCameraPitch());
+        }
+    }
+
+    @Inject(method = "isDetached", at = @At("HEAD"), cancellable = true)
+    private void onIsDetached(CallbackInfoReturnable<Boolean> cir) {
+        FreecamModule freecam = FreecamModule.getInstance();
+        if (freecam != null && freecam.isEnabled()) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void onExtractRenderState(CameraRenderState cameraRenderState, DeltaTracker deltaTracker, CallbackInfo ci) {
+        FreecamModule freecam = FreecamModule.getInstance();
+        if (freecam != null && freecam.isEnabled()) {
+            cameraRenderState.isFirstPerson = false;
         }
     }
 }
