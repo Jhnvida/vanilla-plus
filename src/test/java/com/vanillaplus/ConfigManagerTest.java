@@ -1,6 +1,7 @@
 package com.vanillaplus;
 
 import com.vanillaplus.config.ModConfig;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,7 @@ public class ConfigManagerTest {
         assertFalse(config.fullbrightEnabled, "Fullbright deve iniciar desativado");
         assertFalse(config.lightLevelOverlayEnabled, "LightLevelOverlay deve iniciar desativado");
         assertFalse(config.autoBreedIndicatorEnabled, "BreedIndicator deve iniciar desativado");
+        assertFalse(config.autoMineEnabled, "AutoMine deve iniciar desativado");
 
         assertTrue(config.autoBreedRange <= 4.5, "Alcance do AutoBreed não deve exceder reach vanilla");
         assertTrue(config.autoBreedIntervalMs >= 200, "Delay do AutoBreed deve respeitar rate limit");
@@ -32,6 +34,10 @@ public class ConfigManagerTest {
         assertTrue(config.autoBreedIndicatorRange >= 4, "Raio do BreedIndicator deve ser no mínimo 4");
         assertEquals(com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D, config.breedIndicatorStyle,
                 "Estilo padrão do indicador de breed deve ser ITEM_3D");
+        assertTrue(config.autoMineRange <= 5.0, "Alcance do AutoMine não deve exceder reach do jogador");
+        assertTrue(config.autoMineDelayTicks >= 0, "Delay do AutoMine deve ser positivo");
+        assertTrue(config.autoMineAutoTool, "Troca automática de ferramenta do AutoMine deve vir ativa");
+        assertTrue(config.autoMineAvoidLava, "Proteção contra lava do AutoMine deve vir ativa");
     }
 
     @Test
@@ -44,7 +50,7 @@ public class ConfigManagerTest {
                             if (json != null && json.isJsonPrimitive()) {
                                 try {
                                     return com.vanillaplus.modules.render.BreedIndicatorStyle
-                                            .valueOf(json.getAsString());
+                                            .valueOf(java.util.Objects.requireNonNull(json.getAsString()));
                                 } catch (IllegalArgumentException ignored) {
                                     return com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D;
                                 }
@@ -54,6 +60,7 @@ public class ConfigManagerTest {
                 .create();
 
         String legacyJsonWithHeart = "{\"breedIndicatorStyle\":\"HEART\"}";
+        @Nullable
         ModConfig loaded = gson.fromJson(legacyJsonWithHeart, ModConfig.class);
         assertNotNull(loaded);
         assertEquals(com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D, loaded.breedIndicatorStyle,

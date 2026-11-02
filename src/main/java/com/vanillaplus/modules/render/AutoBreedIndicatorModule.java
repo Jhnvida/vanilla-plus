@@ -31,8 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
-
 @NullMarked
 public class AutoBreedIndicatorModule extends Module {
     private final ItemStackRenderState itemRenderState = new ItemStackRenderState();
@@ -62,7 +60,7 @@ public class AutoBreedIndicatorModule extends Module {
                 playerPos.x - range, playerPos.y - range, playerPos.z - range,
                 playerPos.x + range, playerPos.y + range, playerPos.z + range);
 
-        List<Animal> nearbyAnimals = level.getEntitiesOfClass(Animal.class, box,
+        var nearbyAnimals = level.getEntitiesOfClass(Animal.class, box,
                 animal -> AutoBreedModule.isReadyForBreeding(animal, config, player,
                         config.autoBreedIndicatorRequireFood));
 
@@ -79,16 +77,10 @@ public class AutoBreedIndicatorModule extends Module {
                 : client.getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
         Vec3 cameraPos = context.levelState().cameraRenderState.pos;
-        if (cameraPos == null) {
-            cameraPos = player.getEyePosition();
-        }
 
         ItemModelResolver resolver = client.getItemModelResolver();
         SubmitNodeCollector submitNodes = context.submitNodeCollector();
         PoseStack poseStack = context.poseStack();
-        if (poseStack == null) {
-            poseStack = new PoseStack();
-        }
 
         for (Animal animal : nearbyAnimals) {
             if (animal.distanceToSqr(player) > range * range) {

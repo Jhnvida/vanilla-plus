@@ -44,7 +44,7 @@ public class AutoReplantModule extends Module {
         if (config.rightClickHarvestOnly) {
             return "Auto Replant [click]";
         } else {
-            return "Auto Replant [click|area]";
+            return "Auto Replant [area]";
         }
     }
 

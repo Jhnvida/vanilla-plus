@@ -44,8 +44,9 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 
 ## Funcionalidades Principais
 
-- **Auto Breed Inteligente:** Alimentação automática de animais elegíveis dentro do raio de interação legítimo, com checagem de idade, cooldown de reprodução e estado de amor.
-- **Auto Replant & Right-Click Harvest:** Colheita e replantio atômico de plantações maduras com preservação da terra arada e suporte a varredura por proximidade.
+- **Auto Mine (Escavação por Área):** Escavação automatizada de áreas cúbicas delimitadas por dois pontos com marcação 3D interativa em tempo real, mineração segura em camadas (de cima para baixo) e seleção dinâmica de ferramentas.
+- **Auto Breed com Indicador 3D:** Alimentação automática e indicador tridimensional discreto com o modelo oficial do alimento flutuando sobre animais prontos para reprodução.
+- **Auto Replant & Right-Click Harvest:** Colheita e replantio atômico de plantações maduras com indicação clara do modo ativo (`[click]` ou `[area]`).
 - **Freecam Segura e Suave:** Desacoplamento da câmera com movimentação tridimensional livre, rotação precisa pelo mouse e supressão de pacotes anômalos.
 - **Auto Tool com Proteção:** Troca dinâmica para a ferramenta mais rápida da hotbar para o bloco minerado, poupando ferramentas com durabilidade crítica.
 - **Auto Refill:** Reposição instantânea de itens ou blocos consumidos na hotbar diretamente do inventário do jogador.
@@ -58,8 +59,9 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 
 ### 1. Automação (`automation`)
 
+- **Auto Mine:** Permite selecionar dois pontos no mundo e escavar sequencialmente toda a área delimitada de cima para baixo, respeitando o alcance vanilla e alternando automaticamente a ferramenta ideal da hotbar.
 - **Auto Breed:** Alimenta animais adultos (Vacas, Coguvacas, Ovelhas, Porcos e Galinhas) dentro do raio configurado respeitando intervalos de cooldown.
-- **Auto Replant:** Colhe e replanta Trigo, Cenoura, Batata e Beterraba mantendo o solo arado hidratado.
+- **Auto Replant:** Colhe e replanta Trigo, Cenoura, Batata e Beterraba mantendo o solo arado hidratado, operando em modo de varredura por área ou exclusivamente por clique com botão direito.
 - **Auto Tool:** Avalia o bloco em quebra e ativa automaticamente a ferramenta ideal da barra de acesso rápido, com limite configurável de durabilidade mínima e retorno ao slot original.
 - **Auto Refill:** Detecta o esgotamento do stack selecionado na hotbar e puxa automaticamente o próximo lote correspondente do inventário.
 
@@ -69,6 +71,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 
 ### 3. Visual & Renderização (`render`)
 
+- **Auto Breed Indicator:** Destaca animais aptos a procriar exibindo o modelo 3D do seu alimento favorito em rotação e flutuação suave sobre a cabeça.
 - **Fullbright:** Ajusta dinamicamente a tabela de iluminação local para permitir visão clara em ambientes escuros e cavernas.
 - **Light Level Overlay:** Renderiza cruzes visuais sobre blocos geráveis indicando zonas com nível de iluminação zero propícias ao spawn de monstros.
 
@@ -123,6 +126,7 @@ vanilla-plus/
 │   │   │   ├── keybinds/               # Gerenciamento de atalhos e teclado
 │   │   │   │   └── KeybindManager.java # Registro de teclas no KeyMappingHelper
 │   │   │   ├── mixin/                  # Injeções de bytecode seguras via Mixins
+│   │   │   │   ├── AnimalMixin.java    # Detecção de evento de reprodução de animais
 │   │   │   │   ├── CameraMixin.java    # Interceptação e desacoplamento da câmera
 │   │   │   │   ├── EntityMixin.java    # Rotação pelo mouse na Freecam
 │   │   │   │   ├── GameRendererMixin.java     # Supressão de renderização da mão
@@ -132,14 +136,17 @@ vanilla-plus/
 │   │   │   ├── modules/                # Módulos funcionais do mod
 │   │   │   │   ├── automation/         # Módulos de automação de tarefas
 │   │   │   │   │   ├── AutoBreedModule.java   # Reprodução inteligente de animais
+│   │   │   │   │   ├── AutoMineModule.java    # Escavação automatizada de áreas
 │   │   │   │   │   ├── AutoRefillModule.java  # Reposição de itens na hotbar
 │   │   │   │   │   ├── AutoReplantModule.java # Colheita e replantio de culturas
 │   │   │   │   │   └── AutoToolModule.java    # Seleção inteligente de ferramentas
 │   │   │   │   ├── movement/           # Módulos de movimentação e exploração
 │   │   │   │   │   └── FreecamModule.java     # Câmera livre desacoplada
 │   │   │   │   └── render/             # Módulos visuais e de iluminação
-│   │   │   │       ├── FullbrightModule.java  # Visão clara e iluminação completa
-│   │   │   │       └── LightLevelOverlayModule.java # Indicador de níveis de luz
+│   │   │   │       ├── AutoBreedIndicatorModule.java # Indicador 3D de reprodução
+│   │   │   │       ├── BreedIndicatorStyle.java      # Estilos visuais do indicador
+│   │   │   │       ├── FullbrightModule.java         # Visão clara e iluminação completa
+│   │   │   │       └── LightLevelOverlayModule.java  # Indicador de níveis de luz
 │   │   │   └── VanillaPlusClientMod.java      # Ponto de entrada (ClientModInitializer)
 │   │   └── resources/
 │   │       ├── assets/vanillaplus/     # Texturas, ícone e recursos de internacionalização
@@ -198,7 +205,7 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
     .\gradlew.bat build
     ```
 
-    O artefato final será gerado no diretório `build/libs/vanillaplus-1.2.0.jar`.
+    O artefato final será gerado no diretório `build/libs/vanillaplus-1.3.0.jar`.
 
 4. **Inicie o cliente de desenvolvimento:**
 
@@ -229,17 +236,19 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
 
 ## Controles e Teclas de Atalho
 
-| Ação / Módulo                | Atalho Padrão    | Descrição                                                                       |
-| ---------------------------- | ---------------- | ------------------------------------------------------------------------------- |
-| **Alternar Freecam**         | `U`              | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador.         |
-| **Alternar Auto Breed**      | `B`              | Ativa ou suspende a alimentação automática de animais na fazenda.               |
-| **Alternar Auto Replant**    | `R`              | Ativa ou suspende a colheita e replantio atômico de plantações.                 |
-| **Alternar Auto Tool**       | `G`              | Ativa ou suspende a seleção automática de ferramentas ao minerar.               |
-| **Alternar Auto Refill**     | `J`              | Ativa ou suspende a reposição automática de stacks na hotbar.                   |
-| **Alternar Fullbright**      | `H`              | Ativa ou desativa a iluminação noturna clara no ambiente.                       |
-| **Alternar Light Level**     | `F7`             | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs.     |
-| **Alternar Breed Indicator** | `V`              | Ativa ou desativa o indicador 3D flutuante de reprodução sobre animais prontos. |
-| **Configurações do Mod**     | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config.          |
+| Ação / Módulo                  | Atalho Padrão    | Descrição                                                                       |
+| ------------------------------ | ---------------- | ------------------------------------------------------------------------------- |
+| **Alternar Auto Mine**         | `M`              | Ativa a seleção de pontos ou inicia/pausa a escavação automática da área.       |
+| **Reiniciar Seleção Auto Mine**| `N`              | Limpa os pontos marcados do Auto Mine para definir uma nova área.               |
+| **Alternar Freecam**           | `U`              | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador.         |
+| **Alternar Auto Breed**        | `B`              | Ativa ou suspende a alimentação automática de animais na fazenda.               |
+| **Alternar Auto Replant**      | `R`              | Ativa ou suspende a colheita e replantio atômico de plantações.                 |
+| **Alternar Auto Tool**         | `G`              | Ativa ou suspende a seleção automática de ferramentas ao minerar.               |
+| **Alternar Auto Refill**       | `J`              | Ativa ou suspende a reposição automática de stacks na hotbar.                   |
+| **Alternar Fullbright**        | `H`              | Ativa ou desativa a iluminação noturna clara no ambiente.                       |
+| **Alternar Light Level**       | `F7`             | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs.     |
+| **Alternar Breed Indicator**   | `V`              | Ativa ou desativa o indicador 3D flutuante de reprodução sobre animais prontos. |
+| **Configurações do Mod**       | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config.          |
 
 ---
 

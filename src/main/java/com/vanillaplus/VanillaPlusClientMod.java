@@ -6,6 +6,7 @@ import com.vanillaplus.core.ModuleManager;
 import com.vanillaplus.gui.StatusHudOverlay;
 import com.vanillaplus.keybinds.KeybindManager;
 import com.vanillaplus.modules.automation.AutoBreedModule;
+import com.vanillaplus.modules.automation.AutoMineModule;
 import com.vanillaplus.modules.automation.AutoRefillModule;
 import com.vanillaplus.modules.automation.AutoReplantModule;
 import com.vanillaplus.modules.automation.AutoToolModule;
@@ -16,6 +17,7 @@ import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NullMarked;
@@ -50,6 +52,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         FullbrightModule fullbright = new FullbrightModule();
         LightLevelOverlayModule lightLevelOverlay = new LightLevelOverlayModule();
         AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
+        AutoMineModule autoMine = new AutoMineModule();
 
         autoBreed.setEnabled(config.autoBreedEnabled);
         autoReplant.setEnabled(config.autoReplantEnabled);
@@ -59,6 +62,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         fullbright.setEnabled(config.fullbrightEnabled);
         lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
         breedIndicator.setEnabled(config.autoBreedIndicatorEnabled);
+        autoMine.setEnabled(config.autoMineEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
@@ -68,11 +72,15 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         moduleManager.registerModule(fullbright);
         moduleManager.registerModule(lightLevelOverlay);
         moduleManager.registerModule(breedIndicator);
+        moduleManager.registerModule(autoMine);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
+        AttackBlockCallback.EVENT.register(autoMine::onAttackBlock);
+        UseBlockCallback.EVENT.register(autoMine::onUseBlock);
 
         LevelRenderEvents.BEFORE_GIZMOS.register(lightLevelOverlay::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(breedIndicator::renderOverlay);
+        LevelRenderEvents.BEFORE_GIZMOS.register(autoMine::renderOverlay);
 
         KeybindManager.register();
 

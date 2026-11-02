@@ -25,7 +25,7 @@ public class ConfigManager {
                     (JsonDeserializer<BreedIndicatorStyle>) (json, typeOfT, ctx) -> {
                         if (json != null && json.isJsonPrimitive()) {
                             try {
-                                return BreedIndicatorStyle.valueOf(json.getAsString());
+                                return BreedIndicatorStyle.valueOf(Objects.requireNonNull(json.getAsString()));
                             } catch (IllegalArgumentException ignored) {
                                 return BreedIndicatorStyle.ITEM_3D;
                             }
@@ -33,9 +33,17 @@ public class ConfigManager {
                         return BreedIndicatorStyle.ITEM_3D;
                     })
             .create());
-    private static final File CONFIG_FILE = new File(
-            FabricLoader.getInstance().getConfigDir().toFile(),
-            "vanillaplus.json");
+    private static final File CONFIG_FILE = resolveConfigFile();
+
+    private static File resolveConfigFile() {
+        try {
+            if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
+                return new File(FabricLoader.getInstance().getConfigDir().toFile(), "vanillaplus.json");
+            }
+        } catch (Throwable ignored) {
+        }
+        return new File("build/tmp/test-config/vanillaplus.json");
+    }
 
     private static ModConfig config = new ModConfig();
 

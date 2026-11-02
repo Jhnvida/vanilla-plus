@@ -44,6 +44,12 @@ public class ModConfig {
     public boolean autoBreedIndicatorRequireFood = false;
     public com.vanillaplus.modules.render.BreedIndicatorStyle breedIndicatorStyle = com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D;
 
+    public boolean autoMineEnabled = false;
+    public double autoMineRange = 4.5;
+    public int autoMineDelayTicks = 2;
+    public boolean autoMineAutoTool = true;
+    public boolean autoMineAvoidLava = true;
+
     public ModConfig() {
     }
 }

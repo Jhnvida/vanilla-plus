@@ -1,5 +1,8 @@
 package com.vanillaplus.modules.render;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum BreedIndicatorStyle {
     ITEM_3D("Item 3D Flutuante"),
     OUTLINE("Caixa Delimitadora (ESP)");

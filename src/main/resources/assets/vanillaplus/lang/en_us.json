@@ -7,5 +7,7 @@
     "key.vanillaplus.toggle_auto_refill": "Toggle Auto Refill",
     "key.vanillaplus.toggle_fullbright": "Toggle Fullbright",
     "key.vanillaplus.toggle_light_level": "Toggle Light Level Overlay",
-    "key.vanillaplus.toggle_breed_indicator": "Toggle Breed Indicator"
+    "key.vanillaplus.toggle_breed_indicator": "Toggle Breed Indicator",
+    "key.vanillaplus.toggle_auto_mine": "Toggle Auto Mine",
+    "key.vanillaplus.reset_auto_mine": "Reset Auto Mine Selection"
 }

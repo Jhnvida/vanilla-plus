@@ -22,6 +22,8 @@ public class KeybindManager {
     private static @Nullable KeyMapping toggleFullbrightKey;
     private static @Nullable KeyMapping toggleLightLevelKey;
     private static @Nullable KeyMapping toggleBreedIndicatorKey;
+    private static @Nullable KeyMapping toggleAutoMineKey;
+    private static @Nullable KeyMapping resetAutoMineKey;
 
     public static void register() {
         toggleAutoBreedKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
@@ -62,6 +64,16 @@ public class KeybindManager {
         toggleBreedIndicatorKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.vanillaplus.toggle_breed_indicator",
                 InputConstants.KEY_V,
+                CATEGORY));
+
+        toggleAutoMineKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.vanillaplus.toggle_auto_mine",
+                InputConstants.KEY_M,
+                CATEGORY));
+
+        resetAutoMineKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.vanillaplus.reset_auto_mine",
+                InputConstants.KEY_N,
                 CATEGORY));
     }
 
@@ -121,6 +133,24 @@ public class KeybindManager {
                 moduleManager.getModule("breed_indicator").ifPresent(m -> m.toggle());
             }
         }
+
+        KeyMapping autoMine = toggleAutoMineKey;
+        if (autoMine != null) {
+            while (autoMine.consumeClick()) {
+                moduleManager.getModule("auto_mine").ifPresent(m -> m.toggle());
+            }
+        }
+
+        KeyMapping resetAutoMine = resetAutoMineKey;
+        if (resetAutoMine != null) {
+            while (resetAutoMine.consumeClick()) {
+                moduleManager.getModule("auto_mine").ifPresent(m -> {
+                    if (m instanceof com.vanillaplus.modules.automation.AutoMineModule mine) {
+                        mine.resetSelection();
+                    }
+                });
+            }
+        }
     }
 
     public static @Nullable KeyMapping getToggleAutoBreedKey() {
@@ -153,5 +183,13 @@ public class KeybindManager {
 
     public static @Nullable KeyMapping getToggleBreedIndicatorKey() {
         return toggleBreedIndicatorKey;
+    }
+
+    public static @Nullable KeyMapping getToggleAutoMineKey() {
+        return toggleAutoMineKey;
+    }
+
+    public static @Nullable KeyMapping getResetAutoMineKey() {
+        return resetAutoMineKey;
     }
 }

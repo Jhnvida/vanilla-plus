@@ -171,6 +171,59 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                         .build());
                 }
 
+                if (KeybindManager.getToggleAutoMineKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Mine"),
+                                                        KeybindManager.getToggleAutoMineKey())
+                                        .build());
+                }
+
+                if (KeybindManager.getResetAutoMineKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla para Reiniciar Seleção"),
+                                                        KeybindManager.getResetAutoMineKey())
+                                        .build());
+                }
+
+                automation.addEntry(entryBuilder
+                                .startDoubleField(Component.literal("Alcance do Auto Mine (blocos)"),
+                                                config.autoMineRange)
+                                .setDefaultValue(4.5)
+                                .setMin(2.0)
+                                .setMax(5.0)
+                                .setTooltip(Component.literal(
+                                                "Distância máxima que o jogador alcança para quebrar os blocos da área"))
+                                .setSaveConsumer(newValue -> config.autoMineRange = newValue)
+                                .build());
+
+                automation.addEntry(entryBuilder
+                                .startIntField(Component.literal("Delay entre Quebras (ticks)"),
+                                                config.autoMineDelayTicks)
+                                .setDefaultValue(2)
+                                .setMin(0)
+                                .setMax(10)
+                                .setTooltip(Component.literal("Pausa entre a quebra de um bloco e o início do próximo"))
+                                .setSaveConsumer(newValue -> config.autoMineDelayTicks = newValue)
+                                .build());
+
+                automation.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Troca Automática de Ferramenta"),
+                                                config.autoMineAutoTool)
+                                .setDefaultValue(true)
+                                .setTooltip(Component.literal(
+                                                "Seleciona a ferramenta ideal da hotbar para cada bloco da área"))
+                                .setSaveConsumer(newValue -> config.autoMineAutoTool = newValue)
+                                .build());
+
+                automation.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Evitar Blocos com Lava"),
+                                                config.autoMineAvoidLava)
+                                .setDefaultValue(true)
+                                .setTooltip(Component.literal(
+                                                "Pula blocos adjacentes a lava para prevenir acidentes e queima de itens"))
+                                .setSaveConsumer(newValue -> config.autoMineAvoidLava = newValue)
+                                .build());
+
                 ConfigCategory movement = builder.getOrCreateCategory(Component.literal("Movimentação"));
 
                 if (KeybindManager.getToggleFreecamKey() != null) {
@@ -250,12 +303,10 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                                 currentStyle)
                                 .setDefaultValue(BreedIndicatorStyle.ITEM_3D)
                                 .setEnumNameProvider(style -> {
-                                        if (style == BreedIndicatorStyle.ITEM_3D) {
-                                                return Component.literal("Item 3D Flutuante");
-                                        } else if (style == BreedIndicatorStyle.OUTLINE) {
+                                        if (style == BreedIndicatorStyle.OUTLINE) {
                                                 return Component.literal("Caixa Delimitadora (ESP)");
                                         }
-                                        return Component.literal(style != null ? style.toString() : "Padrão");
+                                        return Component.literal("Item 3D Flutuante");
                                 })
                                 .setTooltip(Component.literal(
                                                 "Escolha entre Item 3D Flutuante do Alimento ou Caixa Delimitadora ESP"))

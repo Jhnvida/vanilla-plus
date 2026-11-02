@@ -70,7 +70,7 @@ public class AutoToolModule extends Module {
         }
     }
 
-    private int findBestToolSlot(LocalPlayer player, BlockState state, ModConfig config) {
+    public static int findBestToolSlot(LocalPlayer player, BlockState state, ModConfig config) {
         int bestSlot = -1;
         float bestSpeed = 1.0f;
 
@@ -105,7 +105,7 @@ public class AutoToolModule extends Module {
         return bestSlot;
     }
 
-    private boolean isUsable(ItemStack stack, ModConfig config) {
+    public static boolean isUsable(ItemStack stack, ModConfig config) {
         if (!config.autoToolProtectDurability || !stack.isDamageableItem()) {
             return true;
         }
