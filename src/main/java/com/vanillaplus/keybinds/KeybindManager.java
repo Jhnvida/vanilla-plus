@@ -21,6 +21,7 @@ public class KeybindManager {
     private static @Nullable KeyMapping toggleAutoRefillKey;
     private static @Nullable KeyMapping toggleFullbrightKey;
     private static @Nullable KeyMapping toggleLightLevelKey;
+    private static @Nullable KeyMapping toggleBreedIndicatorKey;
 
     public static void register() {
         toggleAutoBreedKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
@@ -56,6 +57,11 @@ public class KeybindManager {
         toggleLightLevelKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.vanillaplus.toggle_light_level",
                 InputConstants.KEY_F7,
+                CATEGORY));
+
+        toggleBreedIndicatorKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.vanillaplus.toggle_breed_indicator",
+                InputConstants.KEY_V,
                 CATEGORY));
     }
 
@@ -108,6 +114,13 @@ public class KeybindManager {
                 moduleManager.getModule("light_level_overlay").ifPresent(m -> m.toggle());
             }
         }
+
+        KeyMapping breedIndicator = toggleBreedIndicatorKey;
+        if (breedIndicator != null) {
+            while (breedIndicator.consumeClick()) {
+                moduleManager.getModule("breed_indicator").ifPresent(m -> m.toggle());
+            }
+        }
     }
 
     public static @Nullable KeyMapping getToggleAutoBreedKey() {
@@ -136,5 +149,9 @@ public class KeybindManager {
 
     public static @Nullable KeyMapping getToggleLightLevelKey() {
         return toggleLightLevelKey;
+    }
+
+    public static @Nullable KeyMapping getToggleBreedIndicatorKey() {
+        return toggleBreedIndicatorKey;
     }
 }

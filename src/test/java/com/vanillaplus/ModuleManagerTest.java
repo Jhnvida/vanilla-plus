@@ -7,6 +7,7 @@ import com.vanillaplus.modules.automation.AutoRefillModule;
 import com.vanillaplus.modules.automation.AutoReplantModule;
 import com.vanillaplus.modules.automation.AutoToolModule;
 import com.vanillaplus.modules.movement.FreecamModule;
+import com.vanillaplus.modules.render.AutoBreedIndicatorModule;
 import com.vanillaplus.modules.render.FullbrightModule;
 import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,7 @@ public class ModuleManagerTest {
         FreecamModule freecam = new FreecamModule();
         FullbrightModule fullbright = new FullbrightModule();
         LightLevelOverlayModule lightOverlay = new LightLevelOverlayModule();
+        AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
 
         manager.registerModule(autoBreed);
         manager.registerModule(autoReplant);
@@ -36,8 +38,9 @@ public class ModuleManagerTest {
         manager.registerModule(freecam);
         manager.registerModule(fullbright);
         manager.registerModule(lightOverlay);
+        manager.registerModule(breedIndicator);
 
-        assertEquals(7, manager.getModules().size());
+        assertEquals(8, manager.getModules().size());
         assertTrue(manager.getModule("auto_breed").isPresent());
         assertTrue(manager.getModule("auto_replant").isPresent());
         assertTrue(manager.getModule("auto_tool").isPresent());
@@ -45,11 +48,12 @@ public class ModuleManagerTest {
         assertTrue(manager.getModule("freecam").isPresent());
         assertTrue(manager.getModule("fullbright").isPresent());
         assertTrue(manager.getModule("light_level_overlay").isPresent());
+        assertTrue(manager.getModule("breed_indicator").isPresent());
         assertFalse(manager.getModule("invalid_id").isPresent());
 
         assertEquals(4, manager.getModulesByCategory(ModuleCategory.AUTOMATION).size());
         assertEquals(1, manager.getModulesByCategory(ModuleCategory.MOVEMENT).size());
-        assertEquals(2, manager.getModulesByCategory(ModuleCategory.RENDER).size());
+        assertEquals(3, manager.getModulesByCategory(ModuleCategory.RENDER).size());
         assertEquals(0, manager.getModulesByCategory(ModuleCategory.GENERAL).size());
     }
 }

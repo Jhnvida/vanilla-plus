@@ -8,6 +8,7 @@ run/
 
 # Documentação interna de desenvolvimento
 docs/
+TODO.md
 
 # IDEs e editores
 .idea/

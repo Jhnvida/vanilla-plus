@@ -39,6 +39,11 @@ public class ModConfig {
     public int lightLevelOverlayRadius = 12;
     public boolean lightLevelShowSafe = false;
 
+    public boolean autoBreedIndicatorEnabled = false;
+    public int autoBreedIndicatorRange = 16;
+    public boolean autoBreedIndicatorRequireFood = false;
+    public com.vanillaplus.modules.render.BreedIndicatorStyle breedIndicatorStyle = com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D;
+
     public ModConfig() {
     }
 }

@@ -28,11 +28,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @NullMarked
 public class AutoBreedModule extends Module {
     private long lastBreedTime = 0;
-    private final Map<Integer, Long> fedCooldowns = new ConcurrentHashMap<>();
+    private static final Map<Integer, Long> globalCooldowns = new ConcurrentHashMap<>();
 
     public AutoBreedModule() {
         super("auto_breed", "Auto Breed", "Alimenta automaticamente animais elegíveis para reprodução nas proximidades",
                 ModuleCategory.AUTOMATION);
+    }
+
+    public static void recordCooldown(int animalId, long durationMs) {
+        globalCooldowns.put(animalId, System.currentTimeMillis() + durationMs);
+    }
+
+    public static boolean isEntityCoolingDown(int animalId) {
+        Long expiry = globalCooldowns.get(animalId);
+        if (expiry == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() > expiry) {
+            globalCooldowns.remove(animalId);
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -47,7 +63,7 @@ public class AutoBreedModule extends Module {
         ModConfig config = ConfigManager.getConfig();
         long now = System.currentTimeMillis();
 
-        fedCooldowns.entrySet().removeIf(entry -> now > entry.getValue());
+        globalCooldowns.entrySet().removeIf(entry -> now > entry.getValue());
 
         if (now - lastBreedTime < config.autoBreedIntervalMs) {
             return;
@@ -60,7 +76,7 @@ public class AutoBreedModule extends Module {
                 playerPos.x + range, playerPos.y + range, playerPos.z + range);
 
         var nearbyAnimals = level.getEntitiesOfClass(Animal.class, searchBox,
-                animal -> isEligible(animal, config, player, now));
+                animal -> isReadyForBreeding(animal, config, player, true));
 
         for (Animal animal : nearbyAnimals) {
             if (animal.distanceToSqr(player) <= range * range
@@ -75,7 +91,7 @@ public class AutoBreedModule extends Module {
                     gameMode.interact(player, animal, new EntityHitResult(animal, hitPos), feedHand);
                     player.swing(feedHand, foodStack.getInteractAnimation(), true);
 
-                    fedCooldowns.put(animal.getId(), now + 15000L);
+                    recordCooldown(animal.getId(), 20000L);
                     lastBreedTime = now;
                     break;
                 }
@@ -84,15 +100,20 @@ public class AutoBreedModule extends Module {
     }
 
     public boolean isEligible(Animal animal, ModConfig config, Minecraft client, long now) {
-        return isEligible(animal, config, client.player, now);
+        return isReadyForBreeding(animal, config, client.player, true);
     }
 
     public boolean isEligible(Animal animal, ModConfig config, @Nullable LocalPlayer player, long now) {
+        return isReadyForBreeding(animal, config, player, true);
+    }
+
+    public static boolean isReadyForBreeding(Animal animal, ModConfig config, @Nullable LocalPlayer player,
+            boolean requireFoodHeld) {
         if (animal.isBaby()) {
             return false;
         }
 
-        if (fedCooldowns.containsKey(animal.getId())) {
+        if (isEntityCoolingDown(animal.getId())) {
             return false;
         }
 
@@ -112,12 +133,20 @@ public class AutoBreedModule extends Module {
             return false;
         }
 
-        return getFoodHand(animal, player) != null;
+        if (requireFoodHeld) {
+            if (player == null) {
+                return false;
+            }
+            return getFoodHand(animal, player) != null;
+        }
+
+        return true;
     }
 
-    private @Nullable InteractionHand getFoodHand(Animal animal, @Nullable LocalPlayer player) {
-        if (player == null)
+    public static @Nullable InteractionHand getFoodHand(Animal animal, @Nullable LocalPlayer player) {
+        if (player == null) {
             return null;
+        }
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
@@ -133,8 +162,9 @@ public class AutoBreedModule extends Module {
     }
 
     public static boolean isBreedingFood(@Nullable Animal animal, @Nullable ItemStack stack) {
-        if (stack == null || stack.isEmpty())
+        if (stack == null || stack.isEmpty()) {
             return false;
+        }
 
         if (animal != null) {
             return animal.isFood(stack);
@@ -153,6 +183,6 @@ public class AutoBreedModule extends Module {
     @Override
     public void onDisconnect() {
         super.onDisconnect();
-        fedCooldowns.clear();
+        globalCooldowns.clear();
     }
 }

@@ -5,6 +5,7 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 import com.vanillaplus.config.ConfigManager;
 import com.vanillaplus.config.ModConfig;
 import com.vanillaplus.keybinds.KeybindManager;
+import com.vanillaplus.modules.render.BreedIndicatorStyle;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -230,6 +231,56 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setTooltip(Component.literal(
                                                 "Renderiza marcadores verdes/seguros além dos marcadores de perigo"))
                                 .setSaveConsumer(newValue -> config.lightLevelShowSafe = newValue)
+                                .build());
+
+                if (KeybindManager.getToggleBreedIndicatorKey() != null) {
+                        render.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Breed Indicator"),
+                                                        KeybindManager.getToggleBreedIndicatorKey())
+                                        .build());
+                }
+
+                BreedIndicatorStyle currentStyle = config.breedIndicatorStyle != null
+                                ? config.breedIndicatorStyle
+                                : BreedIndicatorStyle.ITEM_3D;
+
+                render.addEntry(entryBuilder
+                                .startEnumSelector(Component.literal("Estilo do Indicador"),
+                                                BreedIndicatorStyle.class,
+                                                currentStyle)
+                                .setDefaultValue(BreedIndicatorStyle.ITEM_3D)
+                                .setEnumNameProvider(style -> {
+                                        if (style == BreedIndicatorStyle.ITEM_3D) {
+                                                return Component.literal("Item 3D Flutuante");
+                                        } else if (style == BreedIndicatorStyle.OUTLINE) {
+                                                return Component.literal("Caixa Delimitadora (ESP)");
+                                        }
+                                        return Component.literal(style != null ? style.toString() : "Padrão");
+                                })
+                                .setTooltip(Component.literal(
+                                                "Escolha entre Item 3D Flutuante do Alimento ou Caixa Delimitadora ESP"))
+                                .setSaveConsumer(newValue -> config.breedIndicatorStyle = (newValue != null ? newValue
+                                                : BreedIndicatorStyle.ITEM_3D))
+                                .build());
+
+                render.addEntry(entryBuilder
+                                .startIntField(Component.literal("Raio do Breed Indicator (blocos)"),
+                                                config.autoBreedIndicatorRange)
+                                .setDefaultValue(16)
+                                .setMin(4)
+                                .setMax(32)
+                                .setTooltip(Component
+                                                .literal("Distância máxima para detectar e destacar animais prontos"))
+                                .setSaveConsumer(newValue -> config.autoBreedIndicatorRange = newValue)
+                                .build());
+
+                render.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Exigir Comida na Mão"),
+                                                config.autoBreedIndicatorRequireFood)
+                                .setDefaultValue(false)
+                                .setTooltip(Component.literal(
+                                                "Apenas destaca os animais quando você estiver segurando a comida adequada"))
+                                .setSaveConsumer(newValue -> config.autoBreedIndicatorRequireFood = newValue)
                                 .build());
 
                 builder.setSavingRunnable(() -> {

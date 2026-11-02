@@ -36,7 +36,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 
 - **Execução 100% Client-Side:** Opera exclusivamente na camada do cliente sem exigir modificações, permissões ou plugins adicionais no lado do servidor.
 - **Arquitetura Modular Desacoplada:** Estruturado no padrão de módulos autônomos (`Module`), gerenciados centralmente por um `ModuleManager` que orquestra o ciclo de vida e o despacho de ticks de forma otimizada.
-- **Prevenção de Abuso e Anti-Ban:** Mecanismos rigorosos de controle de taxa de interação (*rate limiting*) e interceptação via Mixins para bloquear o envio de pacotes suspeitos de posicionamento durante o uso de câmera livre.
+- **Prevenção de Abuso e Anti-Ban:** Mecanismos rigorosos de controle de taxa de interação (_rate limiting_) e interceptação via Mixins para bloquear o envio de pacotes suspeitos de posicionamento durante o uso de câmera livre.
 - **Configuração Atômica e Visual:** Integração nativa com a Cloth Config API e o catálogo ModMenu, permitindo ajustes em tempo real com persistência atômica em formato JSON (`.minecraft/config/vanillaplus.json`).
 - **Overlay HUD Minimalista e Animado:** Interface visual no canto superior com animação fluida (slide e fade com interpolação cúbica), ordenação inteligente por tamanho de texto e destaque sutil de modos ativos.
 
@@ -198,7 +198,7 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
     .\gradlew.bat build
     ```
 
-   O artefato final será gerado no diretório `build/libs/vanillaplus-1.1.0.jar`.
+    O artefato final será gerado no diretório `build/libs/vanillaplus-1.2.0.jar`.
 
 4. **Inicie o cliente de desenvolvimento:**
 
@@ -217,28 +217,29 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
 
 ## Scripts Disponíveis
 
-| Comando | Descrição |
-| --- | --- |
-| `./gradlew build` | Executa a verificação completa, testes unitários e compila o `.jar` final do mod. |
-| `./gradlew runClient` | Inicializa o cliente do Minecraft em ambiente de depuração com o mod carregado. |
-| `./gradlew test` | Executa todos os testes unitários automatizados através do JUnit Platform. |
-| `./gradlew check` | Dispara todas as etapas de verificação e checagem de integridade do código. |
-| `./gradlew clean` | Remove os diretórios de compilação anteriores na pasta `build/`. |
+| Comando               | Descrição                                                                         |
+| --------------------- | --------------------------------------------------------------------------------- |
+| `./gradlew build`     | Executa a verificação completa, testes unitários e compila o `.jar` final do mod. |
+| `./gradlew runClient` | Inicializa o cliente do Minecraft em ambiente de depuração com o mod carregado.   |
+| `./gradlew test`      | Executa todos os testes unitários automatizados através do JUnit Platform.        |
+| `./gradlew check`     | Dispara todas as etapas de verificação e checagem de integridade do código.       |
+| `./gradlew clean`     | Remove os diretórios de compilação anteriores na pasta `build/`.                  |
 
 ---
 
 ## Controles e Teclas de Atalho
 
-| Ação / Módulo | Atalho Padrão | Descrição |
-| --- | --- | --- |
-| **Alternar Freecam** | `U` | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador. |
-| **Alternar Auto Breed** | `B` | Ativa ou suspende a alimentação automática de animais na fazenda. |
-| **Alternar Auto Replant** | `R` | Ativa ou suspende a colheita e replantio atômico de plantações. |
-| **Alternar Auto Tool** | `G` | Ativa ou suspende a seleção automática de ferramentas ao minerar. |
-| **Alternar Auto Refill** | `J` | Ativa ou suspende a reposição automática de stacks na hotbar. |
-| **Alternar Fullbright** | `H` | Ativa ou desativa a iluminação noturna clara no ambiente. |
-| **Alternar Light Level** | `F7` | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs. |
-| **Configurações do Mod** | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config. |
+| Ação / Módulo                | Atalho Padrão    | Descrição                                                                       |
+| ---------------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| **Alternar Freecam**         | `U`              | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador.         |
+| **Alternar Auto Breed**      | `B`              | Ativa ou suspende a alimentação automática de animais na fazenda.               |
+| **Alternar Auto Replant**    | `R`              | Ativa ou suspende a colheita e replantio atômico de plantações.                 |
+| **Alternar Auto Tool**       | `G`              | Ativa ou suspende a seleção automática de ferramentas ao minerar.               |
+| **Alternar Auto Refill**     | `J`              | Ativa ou suspende a reposição automática de stacks na hotbar.                   |
+| **Alternar Fullbright**      | `H`              | Ativa ou desativa a iluminação noturna clara no ambiente.                       |
+| **Alternar Light Level**     | `F7`             | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs.     |
+| **Alternar Breed Indicator** | `V`              | Ativa ou desativa o indicador 3D flutuante de reprodução sobre animais prontos. |
+| **Configurações do Mod**     | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config.          |
 
 ---
 

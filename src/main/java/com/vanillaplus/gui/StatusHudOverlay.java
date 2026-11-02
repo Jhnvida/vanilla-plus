@@ -101,23 +101,16 @@ public class StatusHudOverlay implements HudElement {
             String fullName = module.getDisplayName();
             int textWidth = font.width(fullName);
 
-            int slideOffset = (int) ((1.0f - eased) * 20.0f);
-
-            int baseTargetX = screenWidth - textWidth - rightMargin - 4;
-            int x = baseTargetX + slideOffset;
-            int boxRight = screenWidth - rightMargin + slideOffset;
-            int boxLeft = x - 5;
+            int slideOffset = (int) ((1.0f - eased) * 16.0f);
+            int x = screenWidth - textWidth - rightMargin + slideOffset;
 
             int alpha = (int) (eased * 255.0f);
-            int bgAlpha = (int) (eased * 0x58);
+            if (alpha < 4) {
+                continue;
+            }
 
-            int bgColor = (bgAlpha << 24) | 0x0B0F17;
-            int accentColor = (alpha << 24) | 0x7DD3FC;
-            int textColor = (alpha << 24) | 0xF8FAFC;
-            int tagColor = (alpha << 24) | 0x94A3B8;
-
-            extractor.fill(boxLeft, y - 2, boxRight, y + 10, bgColor);
-            extractor.fill(boxRight - 1, y - 2, boxRight, y + 10, accentColor);
+            int textColor = (alpha << 24) | 0xFFFFFF;
+            int tagColor = (alpha << 24) | 0xAAAAAA;
 
             int bracketIdx = fullName.indexOf(" [");
             if (bracketIdx != -1) {
@@ -130,7 +123,7 @@ public class StatusHudOverlay implements HudElement {
                 extractor.text(font, Component.literal(fullName), x, y, textColor, true);
             }
 
-            y += (int) (13 * eased);
+            y += (int) (10 * eased);
         }
     }
 }

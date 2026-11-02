@@ -10,6 +10,7 @@ import com.vanillaplus.modules.automation.AutoRefillModule;
 import com.vanillaplus.modules.automation.AutoReplantModule;
 import com.vanillaplus.modules.automation.AutoToolModule;
 import com.vanillaplus.modules.movement.FreecamModule;
+import com.vanillaplus.modules.render.AutoBreedIndicatorModule;
 import com.vanillaplus.modules.render.FullbrightModule;
 import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import net.fabricmc.api.ClientModInitializer;
@@ -48,6 +49,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         AutoRefillModule autoRefill = new AutoRefillModule();
         FullbrightModule fullbright = new FullbrightModule();
         LightLevelOverlayModule lightLevelOverlay = new LightLevelOverlayModule();
+        AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
 
         autoBreed.setEnabled(config.autoBreedEnabled);
         autoReplant.setEnabled(config.autoReplantEnabled);
@@ -56,6 +58,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         autoRefill.setEnabled(config.autoRefillEnabled);
         fullbright.setEnabled(config.fullbrightEnabled);
         lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
+        breedIndicator.setEnabled(config.autoBreedIndicatorEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
@@ -64,10 +67,12 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         moduleManager.registerModule(autoRefill);
         moduleManager.registerModule(fullbright);
         moduleManager.registerModule(lightLevelOverlay);
+        moduleManager.registerModule(breedIndicator);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
 
         LevelRenderEvents.BEFORE_GIZMOS.register(lightLevelOverlay::renderOverlay);
+        LevelRenderEvents.BEFORE_GIZMOS.register(breedIndicator::renderOverlay);
 
         KeybindManager.register();
 

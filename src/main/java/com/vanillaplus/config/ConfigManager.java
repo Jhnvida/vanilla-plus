@@ -2,6 +2,8 @@ package com.vanillaplus.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.vanillaplus.modules.render.BreedIndicatorStyle;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -17,7 +19,20 @@ import java.util.Objects;
 @NullMarked
 public class ConfigManager {
     private static final Logger LOGGER = Objects.requireNonNull(LoggerFactory.getLogger("VanillaPlus/Config"));
-    private static final Gson GSON = Objects.requireNonNull(new GsonBuilder().setPrettyPrinting().create());
+    private static final Gson GSON = Objects.requireNonNull(new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(BreedIndicatorStyle.class,
+                    (JsonDeserializer<BreedIndicatorStyle>) (json, typeOfT, ctx) -> {
+                        if (json != null && json.isJsonPrimitive()) {
+                            try {
+                                return BreedIndicatorStyle.valueOf(json.getAsString());
+                            } catch (IllegalArgumentException ignored) {
+                                return BreedIndicatorStyle.ITEM_3D;
+                            }
+                        }
+                        return BreedIndicatorStyle.ITEM_3D;
+                    })
+            .create());
     private static final File CONFIG_FILE = new File(
             FabricLoader.getInstance().getConfigDir().toFile(),
             "vanillaplus.json");
@@ -40,6 +55,9 @@ public class ConfigManager {
             @Nullable
             ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
             if (loaded != null) {
+                if (loaded.breedIndicatorStyle == null) {
+                    loaded.breedIndicatorStyle = com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D;
+                }
                 config = loaded;
                 LOGGER.info("Configurações do VanillaPlus carregadas com sucesso.");
             }
