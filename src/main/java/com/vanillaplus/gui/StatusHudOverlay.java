@@ -74,7 +74,7 @@ public class StatusHudOverlay implements HudElement {
 
             float eased = 1.0f - (float) Math.pow(1.0f - progress, 3);
 
-            String name = module.getName();
+            String name = module.getDisplayName();
             int textWidth = font.width(name);
             int baseTargetX = screenWidth - textWidth - 8;
 

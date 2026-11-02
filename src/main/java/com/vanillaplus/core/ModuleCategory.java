@@ -3,6 +3,7 @@ package com.vanillaplus.core;
 public enum ModuleCategory {
     AUTOMATION("Automação", "Módulos para automação de tarefas cotidianas e agrícolas"),
     MOVEMENT("Movimentação & Exploração", "Módulos de câmera, navegação e exploração"),
+    RENDER("Visual & Renderização", "Módulos de visibilidade, luz e renderização no mundo"),
     GENERAL("Geral", "Opções gerais e configurações do mod");
 
     private final String displayName;

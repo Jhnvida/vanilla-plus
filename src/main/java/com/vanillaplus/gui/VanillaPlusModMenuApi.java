@@ -4,9 +4,12 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import com.vanillaplus.config.ConfigManager;
 import com.vanillaplus.config.ModConfig;
+import com.vanillaplus.keybinds.KeybindManager;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -28,12 +31,12 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
 
                 ConfigCategory automation = builder.getOrCreateCategory(Component.literal("Automação"));
 
-                automation.addEntry(entryBuilder
-                                .startBooleanToggle(Component.literal("Ativar Auto Breed"), config.autoBreedEnabled)
-                                .setDefaultValue(false)
-                                .setTooltip(Component.literal("Alimenta animais elegíveis próximos automaticamente"))
-                                .setSaveConsumer(newValue -> config.autoBreedEnabled = newValue)
-                                .build());
+                if (KeybindManager.getToggleAutoBreedKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Breed"),
+                                                        KeybindManager.getToggleAutoBreedKey())
+                                        .build());
+                }
 
                 automation.addEntry(entryBuilder
                                 .startDoubleField(Component.literal("Raio do Auto Breed (blocos)"),
@@ -77,17 +80,17 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setSaveConsumer(newValue -> config.breedChickens = newValue)
                                 .build());
 
-                automation.addEntry(entryBuilder
-                                .startBooleanToggle(Component.literal("Ativar Auto Replant"), config.autoReplantEnabled)
-                                .setDefaultValue(false)
-                                .setTooltip(Component.literal("Colhe e replanta automaticamente plantações maduras"))
-                                .setSaveConsumer(newValue -> config.autoReplantEnabled = newValue)
-                                .build());
+                if (KeybindManager.getToggleAutoReplantKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Replant"),
+                                                        KeybindManager.getToggleAutoReplantKey())
+                                        .build());
+                }
 
                 automation.addEntry(entryBuilder
                                 .startBooleanToggle(Component.literal("Apenas Right-Click Harvest"),
                                                 config.rightClickHarvestOnly)
-                                .setDefaultValue(true)
+                                .setDefaultValue(false)
                                 .setTooltip(Component.literal(
                                                 "Requer clique com botão direito na cultura madura para colher e replantar"))
                                 .setSaveConsumer(newValue -> config.rightClickHarvestOnly = newValue)
@@ -126,14 +129,72 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setSaveConsumer(newValue -> config.replantBeetroots = newValue)
                                 .build());
 
+                if (KeybindManager.getToggleAutoToolKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Tool"),
+                                                        KeybindManager.getToggleAutoToolKey())
+                                        .build());
+                }
+
+                automation.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Proteger Durabilidade"),
+                                                config.autoToolProtectDurability)
+                                .setDefaultValue(true)
+                                .setTooltip(Component
+                                                .literal("Evita usar ferramentas com durabilidade perigosamente baixa"))
+                                .setSaveConsumer(newValue -> config.autoToolProtectDurability = newValue)
+                                .build());
+
+                automation.addEntry(entryBuilder
+                                .startIntField(Component.literal("Durabilidade Mínima"), config.autoToolMinDurability)
+                                .setDefaultValue(5)
+                                .setMin(1)
+                                .setMax(100)
+                                .setTooltip(Component
+                                                .literal("Limite mínimo de vida restante para poupar a ferramenta"))
+                                .setSaveConsumer(newValue -> config.autoToolMinDurability = newValue)
+                                .build());
+
+                automation.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Restaurar Slot Anterior"),
+                                                config.autoToolSwitchBack)
+                                .setDefaultValue(true)
+                                .setTooltip(Component.literal("Restaura o item que estava na mão ao parar de minerar"))
+                                .setSaveConsumer(newValue -> config.autoToolSwitchBack = newValue)
+                                .build());
+
+                if (KeybindManager.getToggleAutoFishKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Fish"),
+                                                        KeybindManager.getToggleAutoFishKey())
+                                        .build());
+                }
+
+                automation.addEntry(entryBuilder
+                                .startIntField(Component.literal("Delay de Relançamento (ms)"),
+                                                config.autoFishRecastDelayMs)
+                                .setDefaultValue(600)
+                                .setMin(200)
+                                .setMax(2000)
+                                .setTooltip(Component.literal("Tempo de espera antes de lançar a vara novamente"))
+                                .setSaveConsumer(newValue -> config.autoFishRecastDelayMs = newValue)
+                                .build());
+
+                if (KeybindManager.getToggleAutoRefillKey() != null) {
+                        automation.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Auto Refill"),
+                                                        KeybindManager.getToggleAutoRefillKey())
+                                        .build());
+                }
+
                 ConfigCategory movement = builder.getOrCreateCategory(Component.literal("Movimentação"));
 
-                movement.addEntry(entryBuilder
-                                .startBooleanToggle(Component.literal("Ativar Freecam"), config.freecamEnabled)
-                                .setDefaultValue(false)
-                                .setTooltip(Component.literal("Permite inspecionar o mundo com câmera independente"))
-                                .setSaveConsumer(newValue -> config.freecamEnabled = newValue)
-                                .build());
+                if (KeybindManager.getToggleFreecamKey() != null) {
+                        movement.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Freecam"),
+                                                        KeybindManager.getToggleFreecamKey())
+                                        .build());
+                }
 
                 movement.addEntry(entryBuilder
                                 .startFloatField(Component.literal("Velocidade da Câmera"), config.freecamSpeed)
@@ -152,7 +213,49 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setSaveConsumer(newValue -> config.freecamRenderOwnPlayer = newValue)
                                 .build());
 
-                builder.setSavingRunnable(ConfigManager::save);
+                ConfigCategory render = builder.getOrCreateCategory(Component.literal("Visual & Renderização"));
+
+                if (KeybindManager.getToggleFullbrightKey() != null) {
+                        render.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Fullbright"),
+                                                        KeybindManager.getToggleFullbrightKey())
+                                        .build());
+                }
+
+                if (KeybindManager.getToggleLightLevelKey() != null) {
+                        render.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Light Overlay"),
+                                                        KeybindManager.getToggleLightLevelKey())
+                                        .build());
+                }
+
+                render.addEntry(entryBuilder
+                                .startIntField(Component.literal("Raio do Overlay (blocos)"),
+                                                config.lightLevelOverlayRadius)
+                                .setDefaultValue(12)
+                                .setMin(4)
+                                .setMax(24)
+                                .setTooltip(Component.literal(
+                                                "Distância horizontal máxima ao redor do jogador para renderizar o overlay"))
+                                .setSaveConsumer(newValue -> config.lightLevelOverlayRadius = newValue)
+                                .build());
+
+                render.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Mostrar Blocos Seguros"),
+                                                config.lightLevelShowSafe)
+                                .setDefaultValue(false)
+                                .setTooltip(Component.literal(
+                                                "Renderiza marcadores verdes/seguros além dos marcadores de perigo"))
+                                .setSaveConsumer(newValue -> config.lightLevelShowSafe = newValue)
+                                .build());
+
+                builder.setSavingRunnable(() -> {
+                        ConfigManager.save();
+                        KeyMapping.resetMapping();
+                        if (Minecraft.getInstance().options != null) {
+                                Minecraft.getInstance().options.save();
+                        }
+                });
 
                 return builder.build();
         }

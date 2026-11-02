@@ -26,6 +26,22 @@ public class ModConfig {
     public float freecamSpeed = 1.0f;
     public boolean freecamRenderOwnPlayer = true;
 
+    public boolean autoToolEnabled = false;
+    public boolean autoToolProtectDurability = true;
+    public int autoToolMinDurability = 5;
+    public boolean autoToolSwitchBack = true;
+
+    public boolean autoFishEnabled = false;
+    public int autoFishRecastDelayMs = 600;
+
+    public boolean autoRefillEnabled = false;
+
+    public boolean fullbrightEnabled = false;
+
+    public boolean lightLevelOverlayEnabled = false;
+    public int lightLevelOverlayRadius = 12;
+    public boolean lightLevelShowSafe = false;
+
     public ModConfig() {
     }
 }

@@ -36,47 +36,43 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 
 - **Execução 100% Client-Side:** Opera exclusivamente na camada do cliente sem exigir modificações, permissões ou plugins adicionais no lado do servidor.
 - **Arquitetura Modular Desacoplada:** Estruturado no padrão de módulos autônomos (`Module`), gerenciados centralmente por um `ModuleManager` que orquestra o ciclo de vida e o despacho de ticks de forma otimizada.
-- **Prevenção de Abuso e Anti-Ban:** Mecanismos rigorosos de controle de taxa de interação (_rate limiting_) e interceptação via Mixins para bloquear o envio de pacotes suspeitos de posicionamento durante o uso de câmera livre.
+- **Prevenção de Abuso e Anti-Ban:** Mecanismos rigorosos de controle de taxa de interação (*rate limiting*) e interceptação via Mixins para bloquear o envio de pacotes suspeitos de posicionamento durante o uso de câmera livre.
 - **Configuração Atômica e Visual:** Integração nativa com a Cloth Config API e o catálogo ModMenu, permitindo ajustes em tempo real com persistência atômica em formato JSON (`.minecraft/config/vanillaplus.json`).
+- **Overlay HUD Animado:** Interface visual no canto superior com animação fluida (slide e fade com interpolação cúbica) para indicar em tempo real quais módulos estão ativos.
 
 ---
 
 ## Funcionalidades Principais
 
-- **Auto Breed Inteligente:** Alimentação automática de animais elegíveis dentro do raio de interação legítimo, com checagem rigorosa de idade, cooldown de reprodução e estado de amor.
-- **Auto Replant & Right-Click Harvest:** Colheita e replantio atômico de plantações maduras com preservação da terra arada, além de modo opcional de varredura por proximidade.
-- **Freecam Segura e Suave:** Desacoplamento da câmera com movimentação tridimensional livre, interpolação suave na taxa de quadros e retenção do modelo do jogador na posição original.
-- **Painel de Configurações Gráfico:** Menu completo para personalizar raios de alcance, intervalos em milissegundos, teclas de atalho e filtros individuais de espécies e culturas.
-- **Resiliência e Desconexão Segura:** Restauração instantânea de estados visuais e desativação preventiva de módulos voláteis em eventos de troca de dimensão ou desconexão do servidor.
+- **Auto Breed Inteligente:** Alimentação automática de animais elegíveis dentro do raio de interação legítimo, com checagem de idade, cooldown de reprodução e estado de amor.
+- **Auto Replant & Right-Click Harvest:** Colheita e replantio atômico de plantações maduras com preservação da terra arada e suporte a varredura por proximidade.
+- **Freecam Segura e Suave:** Desacoplamento da câmera com movimentação tridimensional livre, rotação precisa pelo mouse e supressão de pacotes anômalos.
+- **Auto Tool com Proteção:** Troca dinâmica para a ferramenta mais rápida da hotbar para o bloco minerado, poupando ferramentas com durabilidade crítica.
+- **Auto Fish:** Detecção automática de fisgada na boia e recolhimento/relançamento contínuo da linha de pesca.
+- **Auto Refill:** Reposição instantânea de itens ou blocos consumidos na hotbar diretamente do inventário do jogador.
+- **Fullbright:** Iluminação nítida para exploração subterrânea sem alteração de pacotes no servidor.
+- **Light Level Overlay:** Marcadores no chão indicando condições de luz propícias para o surgimento de monstros hostis.
 
 ---
 
 ## Módulos do Sistema
 
-### 1. Auto Breed (`automation`)
+### 1. Automação (`automation`)
 
-Automatiza o processo de reprodução de animais na fazenda sem sobrecarregar a conexão com o servidor.
+- **Auto Breed:** Alimenta animais adultos (Vacas, Coguvacas, Ovelhas, Porcos e Galinhas) dentro do raio configurado respeitando intervalos de cooldown.
+- **Auto Replant:** Colhe e replanta Trigo, Cenoura, Batata e Beterraba mantendo o solo arado hidratado.
+- **Auto Tool:** Avalia o bloco em quebra e ativa automaticamente a ferramenta ideal da barra de acesso rápido, com limite configurável de durabilidade mínima e retorno ao slot original.
+- **Auto Fish:** Monitora fisicamente e via synched data a puxada da boia na água, recolhendo e relançando a linha após intervalo ajustável.
+- **Auto Refill:** Detecta o esgotamento do stack selecionado na hotbar e puxa automaticamente o próximo lote correspondente do inventário.
 
-- **Espécies Suportadas:** Vacas, Coguvacas, Ovelhas, Porcos e Galinhas.
-- **Regras de Validação:** Apenas animais adultos (`!isBaby()`), sem cooldown ativo (`getBreedingAge() == 0`) e que não estejam em modo de amor (`!isInLove()`).
-- **Alimentação Adequada:** Detecta automaticamente o alimento correspondente à espécie na mão do jogador ou na barra de acesso rápido (_hotbar_).
-- **Parâmetros Customizáveis:** Raio de busca (padrão de 3.5 blocos) e atraso mínimo entre alimentações (`feedDelayMs`, padrão de 350ms).
+### 2. Movimentação & Câmera (`movement`)
 
-### 2. Auto Replant (`automation`)
+- **Freecam:** Desacopla a perspectiva visual do jogador, permitindo inspeção tridimensional suave com controle pelo mouse, ajuste dinâmico de velocidade com sprint e retenção do modelo do personagem no ponto de origem.
 
-Facilita a manutenção de fazendas agrícolas, minimizando cliques manuais e evitando quebra acidental de blocos de solo.
+### 3. Visual & Renderização (`render`)
 
-- **Culturas Suportadas:** Trigo, Cenoura, Batata e Beterraba.
-- **Modo Right-Click Harvest (Padrão):** Ao clicar com o botão direito sobre uma cultura madura (`CropBlock.isMature()`), o módulo executa a colheita e replanta uma nova semente instantaneamente a partir do inventário.
-- **Modo Varredura por Área (Opcional):** Monitora plantações vizinhas no raio configurado e realiza a colheita/replantio de forma automatizada com cadência controlada.
-
-### 3. Freecam (`movement`)
-
-Permite inspecionar estruturas, terrenos e projetos de engenharia sem alterar o posicionamento físico do personagem.
-
-- **Câmera Virtual Independente:** Intercepta a rotação e os eixos de projeção através do `CameraMixin` utilizando a API `DeltaTracker`.
-- **Supressão de Pacotes de Movimento:** O `LocalPlayerMixin` bloqueia o envio de `PlayerMoveC2SPacket` enquanto a câmera livre estiver em operação, prevenindo kicks por anti-cheat de voo ou teletransporte.
-- **Visibilidade em Terceira Pessoa:** O corpo do jogador continua totalmente visível no mundo exatamente onde permaneceu.
+- **Fullbright:** Ajusta dinamicamente a tabela de iluminação local para permitir visão clara em ambientes escuros e cavernas.
+- **Light Level Overlay:** Renderiza cruzes visuais sobre blocos geráveis indicando zonas com nível de iluminação zero propícias ao spawn de monstros.
 
 ---
 
@@ -86,7 +82,7 @@ Permite inspecionar estruturas, terrenos e projetos de engenharia sem alterar o 
 
 - **[Minecraft Java Edition (26.3)](https://www.minecraft.net/):** Versão base do jogo com arquitetura desobfuscada nativa.
 - **[Fabric Loader](https://fabricmc.net/):** Carregador de mods moderno, modular e leve.
-- **[Fabric API](https://github.com/FabricMC/fabric):** Conjunto essencial de ganchos de eventos do cliente, ciclo de vida e teclas de atalho.
+- **[Fabric API](https://github.com/FabricMC/fabric):** Conjunto essencial de ganchos de eventos do cliente, ciclo de vida, rendering e teclas de atalho.
 - **[Java 25 (OpenJDK)](https://openjdk.org/):** Plataforma de execução com suporte às melhorias de desempenho mais recentes da JVM.
 
 ### Interface & Configuração
@@ -123,21 +119,34 @@ vanilla-plus/
 │   │   │   │   ├── Module.java         # Classe abstrata base com ciclo de vida
 │   │   │   │   ├── ModuleCategory.java # Categorias de agrupamento dos módulos
 │   │   │   │   └── ModuleManager.java  # Registro singleton e despachante de ticks
-│   │   │   ├── gui/                    # Integração com menus e interfaces
+│   │   │   ├── gui/                    # Interfaces e sobreposições visuais
+│   │   │   │   ├── StatusHudOverlay.java      # HUD animado dos módulos ativos
 │   │   │   │   └── VanillaPlusModMenuApi.java # Conexão com ModMenu e Cloth Config
 │   │   │   ├── keybinds/               # Gerenciamento de atalhos e teclado
 │   │   │   │   └── KeybindManager.java # Registro de teclas no KeyMappingHelper
 │   │   │   ├── mixin/                  # Injeções de bytecode seguras via Mixins
 │   │   │   │   ├── CameraMixin.java    # Interceptação e desacoplamento da câmera
-│   │   │   │   └── LocalPlayerMixin.java # Supressão de pacotes durante Freecam
-│   │   │   ├── modules/                # Módulos funcionais de QoL
-│   │   │   │   ├── automation/         # Módulos de automação consciente
+│   │   │   │   ├── EntityMixin.java    # Rotação pelo mouse na Freecam
+│   │   │   │   ├── FishingHookAccessor.java   # Acesso ao estado de fisgada da boia
+│   │   │   │   ├── GameRendererMixin.java     # Supressão de renderização da mão
+│   │   │   │   ├── LightmapRenderStateExtractorMixin.java # Suporte ao Fullbright
+│   │   │   │   ├── LocalPlayerMixin.java      # Supressão de pacotes durante Freecam
+│   │   │   │   └── ScreenEffectRendererMixin.java # Supressão de sobreposição de blocos
+│   │   │   ├── modules/                # Módulos funcionais do mod
+│   │   │   │   ├── automation/         # Módulos de automação de tarefas
 │   │   │   │   │   ├── AutoBreedModule.java   # Reprodução inteligente de animais
-│   │   │   │   │   └── AutoReplantModule.java # Colheita e replantio de culturas
-│   │   │   │   └── movement/           # Módulos de movimentação e exploração
-│   │   │   │       └── FreecamModule.java     # Câmera livre desacoplada
+│   │   │   │   │   ├── AutoFishModule.java    # Pesca automatizada contínua
+│   │   │   │   │   ├── AutoRefillModule.java  # Reposição de itens na hotbar
+│   │   │   │   │   ├── AutoReplantModule.java # Colheita e replantio de culturas
+│   │   │   │   │   └── AutoToolModule.java    # Seleção inteligente de ferramentas
+│   │   │   │   ├── movement/           # Módulos de movimentação e exploração
+│   │   │   │   │   └── FreecamModule.java     # Câmera livre desacoplada
+│   │   │   │   └── render/             # Módulos visuais e de iluminação
+│   │   │   │       ├── FullbrightModule.java  # Visão clara e iluminação completa
+│   │   │   │       └── LightLevelOverlayModule.java # Indicador de níveis de luz
 │   │   │   └── VanillaPlusClientMod.java      # Ponto de entrada (ClientModInitializer)
 │   │   └── resources/
+│   │       ├── assets/vanillaplus/     # Texturas, ícone e recursos visuais
 │   │       ├── fabric.mod.json         # Manifesto e metadados do Fabric Loader
 │   │       └── vanillaplus.mixins.json # Configuração de injeção dos Mixins
 │   └── test/java/com/vanillaplus/      # Bateria de testes unitários automatizados
@@ -193,7 +202,7 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
     .\gradlew.bat build
     ```
 
-    O artefato final será gerado no diretório `build/libs/vanillaplus-1.0.0.jar`.
+   O artefato final será gerado no diretório `build/libs/vanillaplus-1.1.0.jar`.
 
 4. **Inicie o cliente de desenvolvimento:**
 
@@ -212,24 +221,29 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
 
 ## Scripts Disponíveis
 
-| Comando               | Descrição                                                                         |
-| --------------------- | --------------------------------------------------------------------------------- |
-| `./gradlew build`     | Executa a verificação completa, testes unitários e compila o `.jar` final do mod. |
-| `./gradlew runClient` | Inicializa o cliente do Minecraft em ambiente de depuração com o mod carregado.   |
-| `./gradlew test`      | Executa todos os testes unitários automatizados através do JUnit Platform.        |
-| `./gradlew check`     | Dispara todas as etapas de verificação e checagem de integridade do código.       |
-| `./gradlew clean`     | Remove os diretórios de compilação anteriores na pasta `build/`.                  |
+| Comando | Descrição |
+| --- | --- |
+| `./gradlew build` | Executa a verificação completa, testes unitários e compila o `.jar` final do mod. |
+| `./gradlew runClient` | Inicializa o cliente do Minecraft em ambiente de depuração com o mod carregado. |
+| `./gradlew test` | Executa todos os testes unitários automatizados através do JUnit Platform. |
+| `./gradlew check` | Dispara todas as etapas de verificação e checagem de integridade do código. |
+| `./gradlew clean` | Remove os diretórios de compilação anteriores na pasta `build/`. |
 
 ---
 
 ## Controles e Teclas de Atalho
 
-| Ação / Módulo             | Atalho Padrão            | Descrição                                                               |
-| ------------------------- | ------------------------ | ----------------------------------------------------------------------- |
-| **Alternar Freecam**      | `U`                      | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador. |
-| **Alternar Auto Breed**   | Configurável no ModMenu  | Ativa ou suspende a alimentação automática de animais na fazenda.       |
-| **Alternar Auto Replant** | Configurável no ModMenu  | Ativa ou suspende a colheita e replantio atômico de plantações.         |
-| **Configurações do Mod**  | ModMenu / Menu de Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config.  |
+| Ação / Módulo | Atalho Padrão | Descrição |
+| --- | --- | --- |
+| **Alternar Freecam** | `U` | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador. |
+| **Alternar Auto Breed** | `B` | Ativa ou suspende a alimentação automática de animais na fazenda. |
+| **Alternar Auto Replant** | `R` | Ativa ou suspende a colheita e replantio atômico de plantações. |
+| **Alternar Auto Tool** | `G` | Ativa ou suspende a seleção automática de ferramentas ao minerar. |
+| **Alternar Auto Fish** | `K` | Ativa ou suspende a pesca contínua automatizada. |
+| **Alternar Auto Refill** | `J` | Ativa ou suspende a reposição automática de stacks na hotbar. |
+| **Alternar Fullbright** | `H` | Ativa ou desativa a iluminação noturna clara no ambiente. |
+| **Alternar Light Level** | `F7` | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs. |
+| **Configurações do Mod** | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config. |
 
 ---
 

@@ -6,10 +6,16 @@ import com.vanillaplus.core.ModuleManager;
 import com.vanillaplus.gui.StatusHudOverlay;
 import com.vanillaplus.keybinds.KeybindManager;
 import com.vanillaplus.modules.automation.AutoBreedModule;
+import com.vanillaplus.modules.automation.AutoFishModule;
+import com.vanillaplus.modules.automation.AutoRefillModule;
 import com.vanillaplus.modules.automation.AutoReplantModule;
+import com.vanillaplus.modules.automation.AutoToolModule;
 import com.vanillaplus.modules.movement.FreecamModule;
+import com.vanillaplus.modules.render.FullbrightModule;
+import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -25,7 +31,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        LOGGER.info("Inicializando VanillaPlus para Minecraft 26.3...");
+        LOGGER.info("Inicializando VanillaPlus 1.1 para Minecraft 26.3...");
 
         ConfigManager.load();
         ModConfig config = ConfigManager.getConfig();
@@ -34,15 +40,33 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         AutoReplantModule autoReplant = new AutoReplantModule();
         FreecamModule freecam = new FreecamModule();
 
+        AutoToolModule autoTool = new AutoToolModule();
+        AutoFishModule autoFish = new AutoFishModule();
+        AutoRefillModule autoRefill = new AutoRefillModule();
+        FullbrightModule fullbright = new FullbrightModule();
+        LightLevelOverlayModule lightLevelOverlay = new LightLevelOverlayModule();
+
         autoBreed.setEnabled(config.autoBreedEnabled);
         autoReplant.setEnabled(config.autoReplantEnabled);
         freecam.setEnabled(config.freecamEnabled);
+        autoTool.setEnabled(config.autoToolEnabled);
+        autoFish.setEnabled(config.autoFishEnabled);
+        autoRefill.setEnabled(config.autoRefillEnabled);
+        fullbright.setEnabled(config.fullbrightEnabled);
+        lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
         moduleManager.registerModule(freecam);
+        moduleManager.registerModule(autoTool);
+        moduleManager.registerModule(autoFish);
+        moduleManager.registerModule(autoRefill);
+        moduleManager.registerModule(fullbright);
+        moduleManager.registerModule(lightLevelOverlay);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
+
+        LevelRenderEvents.BEFORE_GIZMOS.register(lightLevelOverlay::renderOverlay);
 
         KeybindManager.register();
 

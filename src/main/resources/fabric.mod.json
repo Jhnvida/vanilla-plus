@@ -4,9 +4,10 @@
     "version": "${version}",
     "name": "VanillaPlus",
     "description": "Mod leve, modular e personalizavel de Qualidade de Vida (QoL), automacao e exploracao para Minecraft.",
-    "authors": ["VanillaPlus Team"],
+    "authors": ["Jhnvida"],
     "contact": {
-        "sources": "https://github.com/vanillaplus/vanillaplus"
+        "sources": "https://github.com/Jhnvida/vanilla-plus",
+        "issues": "https://github.com/Jhnvida/vanilla-plus/issues"
     },
     "license": "MIT",
     "icon": "assets/vanillaplus/icon.png",

@@ -25,6 +25,10 @@ public abstract class Module {
         return name;
     }
 
+    public String getDisplayName() {
+        return getName();
+    }
+
     public String getDescription() {
         return description;
     }

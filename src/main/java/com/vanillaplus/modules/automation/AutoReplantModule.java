@@ -33,6 +33,16 @@ public class AutoReplantModule extends Module {
     }
 
     @Override
+    public String getDisplayName() {
+        ModConfig config = ConfigManager.getConfig();
+        if (config.rightClickHarvestOnly) {
+            return "Auto Replant [click]";
+        } else {
+            return "Auto Replant [click|area]";
+        }
+    }
+
+    @Override
     public void onClientTick(Minecraft client) {
         if (client.player == null || client.level == null || client.gameMode == null) {
             return;
