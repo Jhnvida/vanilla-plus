@@ -24,6 +24,7 @@ public class ConfigManagerTest {
         assertFalse(config.lightLevelOverlayEnabled, "LightLevelOverlay deve iniciar desativado");
         assertFalse(config.autoBreedIndicatorEnabled, "BreedIndicator deve iniciar desativado");
         assertFalse(config.autoMineEnabled, "AutoMine deve iniciar desativado");
+        assertFalse(config.cropIndicatorEnabled, "CropIndicator deve iniciar desativado");
 
         assertTrue(config.autoBreedRange <= 4.5, "Alcance do AutoBreed não deve exceder reach vanilla");
         assertTrue(config.autoBreedIntervalMs >= 200, "Delay do AutoBreed deve respeitar rate limit");
@@ -38,6 +39,10 @@ public class ConfigManagerTest {
         assertTrue(config.autoMineDelayTicks >= 0, "Delay do AutoMine deve ser positivo");
         assertTrue(config.autoMineAutoTool, "Troca automática de ferramenta do AutoMine deve vir ativa");
         assertTrue(config.autoMineAvoidLava, "Proteção contra lava do AutoMine deve vir ativa");
+        assertTrue(config.cropIndicatorRadius >= 4, "Raio do CropIndicator deve ser no mínimo 4");
+        assertTrue(config.cropIndicatorMaxCount >= 4, "Limite do CropIndicator deve ser no mínimo 4");
+        assertFalse(config.cropIndicatorRequireFarmingItem, "Exigir item agrícola deve vir falso");
+        assertTrue(config.cropIndicatorShowNetherWart, "Exibir fungo do Nether deve vir verdadeiro");
     }
 
     @Test

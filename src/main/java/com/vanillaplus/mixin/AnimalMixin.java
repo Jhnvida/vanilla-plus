@@ -14,7 +14,7 @@ public abstract class AnimalMixin {
     private void vanillaplus$onHandleEntityEvent(byte eventId, CallbackInfo ci) {
         if (eventId == 18) {
             Animal animal = (Animal) (Object) this;
-            AutoBreedModule.recordCooldown(animal.getId(), 30000L);
+            AutoBreedModule.onAnimalLoveEvent(animal);
         }
     }
 }

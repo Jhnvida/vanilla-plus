@@ -50,6 +50,12 @@ public class ModConfig {
     public boolean autoMineAutoTool = true;
     public boolean autoMineAvoidLava = true;
 
+    public boolean cropIndicatorEnabled = false;
+    public int cropIndicatorRadius = 10;
+    public int cropIndicatorMaxCount = 16;
+    public boolean cropIndicatorRequireFarmingItem = false;
+    public boolean cropIndicatorShowNetherWart = true;
+
     public ModConfig() {
     }
 }

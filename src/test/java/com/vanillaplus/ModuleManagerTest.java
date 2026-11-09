@@ -9,6 +9,7 @@ import com.vanillaplus.modules.automation.AutoReplantModule;
 import com.vanillaplus.modules.automation.AutoToolModule;
 import com.vanillaplus.modules.movement.FreecamModule;
 import com.vanillaplus.modules.render.AutoBreedIndicatorModule;
+import com.vanillaplus.modules.render.CropIndicatorModule;
 import com.vanillaplus.modules.render.FullbrightModule;
 import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,7 @@ public class ModuleManagerTest {
         LightLevelOverlayModule lightOverlay = new LightLevelOverlayModule();
         AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
         AutoMineModule autoMine = new AutoMineModule();
+        CropIndicatorModule cropIndicator = new CropIndicatorModule();
 
         manager.registerModule(autoBreed);
         manager.registerModule(autoReplant);
@@ -42,8 +44,9 @@ public class ModuleManagerTest {
         manager.registerModule(lightOverlay);
         manager.registerModule(breedIndicator);
         manager.registerModule(autoMine);
+        manager.registerModule(cropIndicator);
 
-        assertEquals(9, manager.getModules().size());
+        assertEquals(10, manager.getModules().size());
         assertTrue(manager.getModule("auto_breed").isPresent());
         assertTrue(manager.getModule("auto_replant").isPresent());
         assertTrue(manager.getModule("auto_tool").isPresent());
@@ -53,11 +56,12 @@ public class ModuleManagerTest {
         assertTrue(manager.getModule("light_level_overlay").isPresent());
         assertTrue(manager.getModule("breed_indicator").isPresent());
         assertTrue(manager.getModule("auto_mine").isPresent());
+        assertTrue(manager.getModule("crop_indicator").isPresent());
         assertFalse(manager.getModule("invalid_id").isPresent());
 
         assertEquals(5, manager.getModulesByCategory(ModuleCategory.AUTOMATION).size());
         assertEquals(1, manager.getModulesByCategory(ModuleCategory.MOVEMENT).size());
-        assertEquals(3, manager.getModulesByCategory(ModuleCategory.RENDER).size());
+        assertEquals(4, manager.getModulesByCategory(ModuleCategory.RENDER).size());
         assertEquals(0, manager.getModulesByCategory(ModuleCategory.GENERAL).size());
     }
 
@@ -107,5 +111,21 @@ public class ModuleManagerTest {
         autoMine.resetSelection();
         assertNull(autoMine.getPos1(), "Reset deve limpar pos1");
         assertNull(autoMine.getPos2(), "Reset deve limpar pos2");
+    }
+
+    @Test
+    @DisplayName("Valida metadados e ciclo do CropIndicatorModule")
+    public void testCropIndicatorMetadata() {
+        CropIndicatorModule module = new CropIndicatorModule();
+        assertEquals("crop_indicator", module.getId());
+        assertEquals("Crop Indicator", module.getName());
+        assertEquals(ModuleCategory.RENDER, module.getCategory());
+        assertFalse(module.isEnabled());
+
+        module.toggle();
+        assertTrue(module.isEnabled());
+
+        module.toggle();
+        assertFalse(module.isEnabled());
     }
 }

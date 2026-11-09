@@ -46,6 +46,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 
 - **Auto Mine (Escavação por Área):** Escavação automatizada de áreas cúbicas delimitadas por dois pontos com marcação 3D interativa em tempo real, mineração segura em camadas (de cima para baixo) e seleção dinâmica de ferramentas.
 - **Auto Breed com Indicador 3D:** Alimentação automática e indicador tridimensional discreto com o modelo oficial do alimento flutuando sobre animais prontos para reprodução.
+- **Crop Indicator (Indicador 3D de Plantações):** Exibe modelos 3D nativos dos produtos sobre culturas 100% maduras (Trigo, Cenoura, Batata, Beterraba e Fungo do Nether) com renderização ultra-otimizada.
 - **Auto Replant & Right-Click Harvest:** Colheita e replantio atômico de plantações maduras com indicação clara do modo ativo (`[click]` ou `[area]`).
 - **Freecam Segura e Suave:** Desacoplamento da câmera com movimentação tridimensional livre, rotação precisa pelo mouse e supressão de pacotes anômalos.
 - **Auto Tool com Proteção:** Troca dinâmica para a ferramenta mais rápida da hotbar para o bloco minerado, poupando ferramentas com durabilidade crítica.
@@ -72,6 +73,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 ### 3. Visual & Renderização (`render`)
 
 - **Auto Breed Indicator:** Destaca animais aptos a procriar exibindo o modelo 3D do seu alimento favorito em rotação e flutuação suave sobre a cabeça.
+- **Crop Indicator:** Destaca plantações totalmente maduras com o modelo 3D flutuante do seu respectivo produto colhível, com orçamento dinâmico de renderização para preservar altas taxas de quadros.
 - **Fullbright:** Ajusta dinamicamente a tabela de iluminação local para permitir visão clara em ambientes escuros e cavernas.
 - **Light Level Overlay:** Renderiza cruzes visuais sobre blocos geráveis indicando zonas com nível de iluminação zero propícias ao spawn de monstros.
 
@@ -248,6 +250,7 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
 | **Alternar Fullbright**        | `H`              | Ativa ou desativa a iluminação noturna clara no ambiente.                       |
 | **Alternar Light Level**       | `F7`             | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs.     |
 | **Alternar Breed Indicator**   | `V`              | Ativa ou desativa o indicador 3D flutuante de reprodução sobre animais prontos. |
+| **Alternar Crop Indicator**    | `K`              | Ativa ou desativa o indicador 3D flutuante de produtos sobre plantações maduras.|
 | **Configurações do Mod**       | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config.          |
 
 ---

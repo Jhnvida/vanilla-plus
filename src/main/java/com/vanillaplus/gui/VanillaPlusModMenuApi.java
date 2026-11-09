@@ -14,7 +14,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VanillaPlusModMenuApi implements ModMenuApi {
+        private static final Logger LOGGER = LoggerFactory.getLogger("VanillaPlus/ModMenu");
 
         @Override
         public ConfigScreenFactory<?> getModConfigScreenFactory() {
@@ -22,7 +26,25 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
         }
 
         public Screen createConfigScreen(Screen parent) {
-                ModConfig config = ConfigManager.getConfig();
+                try {
+                        return buildConfigScreen(parent);
+                } catch (Throwable t) {
+                        LOGGER.error("Falha ao construir a tela de configurações do VanillaPlus:", t);
+                        ConfigBuilder fallback = ConfigBuilder.create()
+                                        .setParentScreen(parent)
+                                        .setTitle(Component.literal("VanillaPlus - Erro"));
+                        fallback.getOrCreateCategory(Component.literal("Erro"))
+                                        .addEntry(fallback.entryBuilder()
+                                                        .startTextDescription(Component.literal("Erro ao carregar configurações: " + t.getMessage()))
+                                                        .build());
+                        return fallback.build();
+                }
+        }
+
+        private Screen buildConfigScreen(Screen parent) {
+                final ModConfig config = ConfigManager.getConfig() != null
+                                ? ConfigManager.getConfig()
+                                : new ModConfig();
 
                 ConfigBuilder builder = ConfigBuilder.create()
                                 .setParentScreen(parent)
@@ -332,6 +354,53 @@ public class VanillaPlusModMenuApi implements ModMenuApi {
                                 .setTooltip(Component.literal(
                                                 "Apenas destaca os animais quando você estiver segurando a comida adequada"))
                                 .setSaveConsumer(newValue -> config.autoBreedIndicatorRequireFood = newValue)
+                                .build());
+
+                if (KeybindManager.getToggleCropIndicatorKey() != null) {
+                        render.addEntry(entryBuilder
+                                        .fillKeybindingField(Component.literal("Tecla de Ativação do Crop Indicator"),
+                                                        KeybindManager.getToggleCropIndicatorKey())
+                                        .build());
+                }
+
+                render.addEntry(entryBuilder
+                                .startIntField(Component.literal("Raio do Crop Indicator (blocos)"),
+                                                config.cropIndicatorRadius)
+                                .setDefaultValue(10)
+                                .setMin(4)
+                                .setMax(24)
+                                .setTooltip(Component.literal(
+                                                "Distância ao redor do jogador para buscar plantações maduras"))
+                                .setSaveConsumer(newValue -> config.cropIndicatorRadius = newValue)
+                                .build());
+
+                render.addEntry(entryBuilder
+                                .startIntField(Component.literal("Limite Máximo de Indicadores"),
+                                                config.cropIndicatorMaxCount)
+                                .setDefaultValue(16)
+                                .setMin(4)
+                                .setMax(64)
+                                .setTooltip(Component.literal(
+                                                "Quantidade máxima de modelos 3D renderizados simultaneamente (preserva FPS)"))
+                                .setSaveConsumer(newValue -> config.cropIndicatorMaxCount = newValue)
+                                .build());
+
+                render.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Apenas com Item Agrícola na Mão"),
+                                                config.cropIndicatorRequireFarmingItem)
+                                .setDefaultValue(false)
+                                .setTooltip(Component.literal(
+                                                "Exibe os indicadores somente ao segurar enxada, sementes, colheitas ou farinha de osso"))
+                                .setSaveConsumer(newValue -> config.cropIndicatorRequireFarmingItem = newValue)
+                                .build());
+
+                render.addEntry(entryBuilder
+                                .startBooleanToggle(Component.literal("Destacar Fungo do Nether"),
+                                                config.cropIndicatorShowNetherWart)
+                                .setDefaultValue(true)
+                                .setTooltip(Component.literal(
+                                                "Inclui plantações de Fungo do Nether maduras na renderização de indicadores"))
+                                .setSaveConsumer(newValue -> config.cropIndicatorShowNetherWart = newValue)
                                 .build());
 
                 builder.setSavingRunnable(() -> {

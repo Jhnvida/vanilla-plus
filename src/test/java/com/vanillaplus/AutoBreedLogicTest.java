@@ -30,4 +30,20 @@ public class AutoBreedLogicTest {
         module.toggle();
         assertFalse(module.isEnabled());
     }
+
+    @Test
+    @DisplayName("Valida tempo canônico de espera entre reproduções (5 minutos)")
+    public void testBreedingCooldownDuration() {
+        assertEquals(300_000L, AutoBreedModule.BREEDING_COOLDOWN_MS,
+                "Cooldown de reprodução deve ser de 5 minutos (300.000 ms / 6000 ticks vanilla)");
+        assertEquals(30_000L, AutoBreedModule.LOVE_MODE_DURATION_MS,
+                "Duração do modo de amor deve ser de 30 segundos (30.000 ms / 600 ticks vanilla)");
+
+        int testAnimalId = 99999;
+        assertFalse(AutoBreedModule.isEntityCoolingDown(testAnimalId));
+
+        AutoBreedModule.recordCooldown(testAnimalId, AutoBreedModule.BREEDING_COOLDOWN_MS);
+        assertTrue(AutoBreedModule.isEntityCoolingDown(testAnimalId),
+                "Animal com cooldown registrado deve constar como em espera");
+    }
 }

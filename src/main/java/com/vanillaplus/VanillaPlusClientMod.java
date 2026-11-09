@@ -12,13 +12,16 @@ import com.vanillaplus.modules.automation.AutoReplantModule;
 import com.vanillaplus.modules.automation.AutoToolModule;
 import com.vanillaplus.modules.movement.FreecamModule;
 import com.vanillaplus.modules.render.AutoBreedIndicatorModule;
+import com.vanillaplus.modules.render.CropIndicatorModule;
 import com.vanillaplus.modules.render.FullbrightModule;
 import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -53,6 +56,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         LightLevelOverlayModule lightLevelOverlay = new LightLevelOverlayModule();
         AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
         AutoMineModule autoMine = new AutoMineModule();
+        CropIndicatorModule cropIndicator = new CropIndicatorModule();
 
         autoBreed.setEnabled(config.autoBreedEnabled);
         autoReplant.setEnabled(config.autoReplantEnabled);
@@ -63,6 +67,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
         breedIndicator.setEnabled(config.autoBreedIndicatorEnabled);
         autoMine.setEnabled(config.autoMineEnabled);
+        cropIndicator.setEnabled(config.cropIndicatorEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
@@ -73,14 +78,18 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         moduleManager.registerModule(lightLevelOverlay);
         moduleManager.registerModule(breedIndicator);
         moduleManager.registerModule(autoMine);
+        moduleManager.registerModule(cropIndicator);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
         AttackBlockCallback.EVENT.register(autoMine::onAttackBlock);
         UseBlockCallback.EVENT.register(autoMine::onUseBlock);
+        UseEntityCallback.EVENT.register(AutoBreedModule::onUseEntity);
+        ClientEntityEvents.ENTITY_LOAD.register(AutoBreedModule::onEntityLoad);
 
         LevelRenderEvents.BEFORE_GIZMOS.register(lightLevelOverlay::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(breedIndicator::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(autoMine::renderOverlay);
+        LevelRenderEvents.BEFORE_GIZMOS.register(cropIndicator::renderOverlay);
 
         KeybindManager.register();
 

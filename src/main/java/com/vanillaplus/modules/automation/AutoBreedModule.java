@@ -9,13 +9,17 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -27,8 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @NullMarked
 public class AutoBreedModule extends Module {
+    public static final long BREEDING_COOLDOWN_MS = 300_000L;
+    public static final long LOVE_MODE_DURATION_MS = 30_000L;
+
     private long lastBreedTime = 0;
     private static final Map<Integer, Long> globalCooldowns = new ConcurrentHashMap<>();
+    private static final Map<Integer, Long> loveModeStartTimes = new ConcurrentHashMap<>();
 
     public AutoBreedModule() {
         super("auto_breed", "Auto Breed", "Alimenta automaticamente animais elegíveis para reprodução nas proximidades",
@@ -46,9 +54,60 @@ public class AutoBreedModule extends Module {
         }
         if (System.currentTimeMillis() > expiry) {
             globalCooldowns.remove(animalId);
+            loveModeStartTimes.remove(animalId);
             return false;
         }
         return true;
+    }
+
+    public static void onAnimalLoveEvent(Animal animal) {
+        long now = System.currentTimeMillis();
+        int id = animal.getId();
+        Long loveStart = loveModeStartTimes.get(id);
+
+        if (loveStart != null && (now - loveStart) < 45_000L && (now - loveStart) > 800L) {
+            recordCooldown(id, BREEDING_COOLDOWN_MS);
+            loveModeStartTimes.remove(id);
+
+            if (animal.level() != null) {
+                AABB partnerBox = animal.getBoundingBox().inflate(3.0, 1.5, 3.0);
+                var partners = animal.level().getEntitiesOfClass(animal.getClass(), partnerBox,
+                        other -> other != animal && !other.isBaby());
+                for (Animal partner : partners) {
+                    recordCooldown(partner.getId(), BREEDING_COOLDOWN_MS);
+                    loveModeStartTimes.remove(partner.getId());
+                }
+            }
+        } else {
+            loveModeStartTimes.put(id, now);
+            recordCooldown(id, LOVE_MODE_DURATION_MS);
+        }
+    }
+
+    public static void onEntityLoad(Entity entity, ClientLevel level) {
+        if (entity instanceof Animal baby && baby.isBaby()) {
+            if (baby.tickCount <= 10) {
+                AABB parentBox = baby.getBoundingBox().inflate(3.5, 2.0, 3.5);
+                var potentialParents = level.getEntitiesOfClass(baby.getClass(), parentBox,
+                        adult -> !adult.isBaby());
+                for (Animal parent : potentialParents) {
+                    recordCooldown(parent.getId(), BREEDING_COOLDOWN_MS);
+                    loveModeStartTimes.remove(parent.getId());
+                }
+            }
+        }
+    }
+
+    public static InteractionResult onUseEntity(Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) {
+        if (level.isClientSide() && entity instanceof Animal animal && !animal.isBaby()) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (isBreedingFood(animal, stack) && !isEntityCoolingDown(animal.getId())) {
+                long now = System.currentTimeMillis();
+                loveModeStartTimes.put(animal.getId(), now);
+                recordCooldown(animal.getId(), LOVE_MODE_DURATION_MS);
+            }
+        }
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -91,7 +150,8 @@ public class AutoBreedModule extends Module {
                     gameMode.interact(player, animal, new EntityHitResult(animal, hitPos), feedHand);
                     player.swing(feedHand, foodStack.getInteractAnimation(), true);
 
-                    recordCooldown(animal.getId(), 20000L);
+                    loveModeStartTimes.put(animal.getId(), now);
+                    recordCooldown(animal.getId(), LOVE_MODE_DURATION_MS);
                     lastBreedTime = now;
                     break;
                 }
@@ -184,5 +244,6 @@ public class AutoBreedModule extends Module {
     public void onDisconnect() {
         super.onDisconnect();
         globalCooldowns.clear();
+        loveModeStartTimes.clear();
     }
 }

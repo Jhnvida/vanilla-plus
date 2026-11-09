@@ -22,6 +22,7 @@ public class KeybindManager {
     private static @Nullable KeyMapping toggleFullbrightKey;
     private static @Nullable KeyMapping toggleLightLevelKey;
     private static @Nullable KeyMapping toggleBreedIndicatorKey;
+    private static @Nullable KeyMapping toggleCropIndicatorKey;
     private static @Nullable KeyMapping toggleAutoMineKey;
     private static @Nullable KeyMapping resetAutoMineKey;
 
@@ -64,6 +65,11 @@ public class KeybindManager {
         toggleBreedIndicatorKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.vanillaplus.toggle_breed_indicator",
                 InputConstants.KEY_V,
+                CATEGORY));
+
+        toggleCropIndicatorKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.vanillaplus.toggle_crop_indicator",
+                InputConstants.KEY_K,
                 CATEGORY));
 
         toggleAutoMineKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
@@ -134,6 +140,13 @@ public class KeybindManager {
             }
         }
 
+        KeyMapping cropIndicator = toggleCropIndicatorKey;
+        if (cropIndicator != null) {
+            while (cropIndicator.consumeClick()) {
+                moduleManager.getModule("crop_indicator").ifPresent(m -> m.toggle());
+            }
+        }
+
         KeyMapping autoMine = toggleAutoMineKey;
         if (autoMine != null) {
             while (autoMine.consumeClick()) {
@@ -183,6 +196,10 @@ public class KeybindManager {
 
     public static @Nullable KeyMapping getToggleBreedIndicatorKey() {
         return toggleBreedIndicatorKey;
+    }
+
+    public static @Nullable KeyMapping getToggleCropIndicatorKey() {
+        return toggleCropIndicatorKey;
     }
 
     public static @Nullable KeyMapping getToggleAutoMineKey() {
