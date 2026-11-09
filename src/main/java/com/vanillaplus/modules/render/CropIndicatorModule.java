@@ -47,7 +47,7 @@ public class CropIndicatorModule extends Module {
     }
 
     public void renderOverlay(LevelRenderContext context) {
-        if (!isEnabled()) {
+        if (!ConfigManager.getConfig().cropIndicatorEnabled) {
             return;
         }
 

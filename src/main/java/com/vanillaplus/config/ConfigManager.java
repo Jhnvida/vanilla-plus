@@ -66,6 +66,9 @@ public class ConfigManager {
                 if (loaded.breedIndicatorStyle == null) {
                     loaded.breedIndicatorStyle = com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D;
                 }
+                if (loaded.moduleKeybinds == null) {
+                    loaded.moduleKeybinds = new java.util.HashMap<>();
+                }
                 config = loaded;
                 LOGGER.info("Configurações do VanillaPlus carregadas com sucesso.");
             }

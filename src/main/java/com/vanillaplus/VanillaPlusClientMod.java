@@ -41,7 +41,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        LOGGER.info("Inicializando VanillaPlus 1.1 para Minecraft 26.3...");
+        LOGGER.info("Inicializando VanillaPlus 2.0 para Minecraft 26.3...");
 
         ConfigManager.load();
         ModConfig config = ConfigManager.getConfig();
@@ -54,8 +54,9 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         AutoRefillModule autoRefill = new AutoRefillModule();
         FullbrightModule fullbright = new FullbrightModule();
         LightLevelOverlayModule lightLevelOverlay = new LightLevelOverlayModule();
-        AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
         AutoMineModule autoMine = new AutoMineModule();
+
+        AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
         CropIndicatorModule cropIndicator = new CropIndicatorModule();
 
         autoBreed.setEnabled(config.autoBreedEnabled);
@@ -65,9 +66,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         autoRefill.setEnabled(config.autoRefillEnabled);
         fullbright.setEnabled(config.fullbrightEnabled);
         lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
-        breedIndicator.setEnabled(config.autoBreedIndicatorEnabled);
         autoMine.setEnabled(config.autoMineEnabled);
-        cropIndicator.setEnabled(config.cropIndicatorEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
@@ -76,9 +75,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         moduleManager.registerModule(autoRefill);
         moduleManager.registerModule(fullbright);
         moduleManager.registerModule(lightLevelOverlay);
-        moduleManager.registerModule(breedIndicator);
         moduleManager.registerModule(autoMine);
-        moduleManager.registerModule(cropIndicator);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
         AttackBlockCallback.EVENT.register(autoMine::onAttackBlock);

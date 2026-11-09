@@ -42,7 +42,7 @@ public class AutoBreedIndicatorModule extends Module {
     }
 
     public void renderOverlay(LevelRenderContext context) {
-        if (!isEnabled()) {
+        if (!ConfigManager.getConfig().autoBreedIndicatorEnabled) {
             return;
         }
 

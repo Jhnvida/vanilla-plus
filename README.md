@@ -207,7 +207,7 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
     .\gradlew.bat build
     ```
 
-    O artefato final será gerado no diretório `build/libs/vanillaplus-1.3.0.jar`.
+    O artefato final será gerado no diretório `build/libs/vanillaplus-2.0.0.jar`.
 
 4. **Inicie o cliente de desenvolvimento:**
 
@@ -238,20 +238,18 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
 
 ## Controles e Teclas de Atalho
 
-| Ação / Módulo                  | Atalho Padrão    | Descrição                                                                       |
-| ------------------------------ | ---------------- | ------------------------------------------------------------------------------- |
-| **Alternar Auto Mine**         | `M`              | Ativa a seleção de pontos ou inicia/pausa a escavação automática da área.       |
-| **Reiniciar Seleção Auto Mine**| `N`              | Limpa os pontos marcados do Auto Mine para definir uma nova área.               |
-| **Alternar Freecam**           | `U`              | Desacopla a câmera do corpo físico ou retorna à perspectiva do jogador.         |
-| **Alternar Auto Breed**        | `B`              | Ativa ou suspende a alimentação automática de animais na fazenda.               |
-| **Alternar Auto Replant**      | `R`              | Ativa ou suspende a colheita e replantio atômico de plantações.                 |
-| **Alternar Auto Tool**         | `G`              | Ativa ou suspende a seleção automática de ferramentas ao minerar.               |
-| **Alternar Auto Refill**       | `J`              | Ativa ou suspende a reposição automática de stacks na hotbar.                   |
-| **Alternar Fullbright**        | `H`              | Ativa ou desativa a iluminação noturna clara no ambiente.                       |
-| **Alternar Light Level**       | `F7`             | Ativa ou desativa os marcadores de níveis de iluminação para spawn de mobs.     |
-| **Alternar Breed Indicator**   | `V`              | Ativa ou desativa o indicador 3D flutuante de reprodução sobre animais prontos. |
-| **Alternar Crop Indicator**    | `K`              | Ativa ou desativa o indicador 3D flutuante de produtos sobre plantações maduras.|
-| **Configurações do Mod**       | ModMenu / Opções | Abre a interface gráfica interativa com os parâmetros da Cloth Config.          |
+O VanillaPlus conta com uma **Central de Gerenciamento Própria** (Menu Interno), inspirada em dashboards modernos no estilo dark theme. Todas as opções, checkboxes, sliders e atribuições de atalhos podem ser gerenciados diretamente na interface.
+
+Por padrão, para evitar conflitos de teclas com o Minecraft ou outros mods, **todos os atalhos de módulos individuais vêm desvinculados** e são 100% opcionais. A única tecla padrão configurada é o **Right Ctrl**.
+
+| Ação / Controle                  | Atalho Padrão      | Descrição                                                                       |
+| -------------------------------- | ------------------ | ------------------------------------------------------------------------------- |
+| **Menu VanillaPlus (Dashboard)** | `Right Ctrl`       | Abre a Central de Gerenciamento própria com navegação por categorias e busca.   |
+| **Configurações pelo ModMenu**   | ModMenu / Opções   | Redireciona diretamente para a Central de Gerenciamento interna do VanillaPlus. |
+| **Atalhos Individuais**          | _Opcionais (None)_ | Cada módulo pode ter sua tecla atribuída ou removida diretamente pelo Menu.     |
+
+> [!TIP]
+> Para atribuir uma tecla a qualquer módulo, abra o menu com `Right Ctrl`, clique no botão `[ None ]` do módulo desejado e pressione a tecla escolhida. Para desvincular ou remover um atalho, basta pressionar `ESC` ou `Backspace` durante a escuta.
 
 ---
 

@@ -43,6 +43,8 @@ public class ConfigManagerTest {
         assertTrue(config.cropIndicatorMaxCount >= 4, "Limite do CropIndicator deve ser no mínimo 4");
         assertFalse(config.cropIndicatorRequireFarmingItem, "Exigir item agrícola deve vir falso");
         assertTrue(config.cropIndicatorShowNetherWart, "Exibir fungo do Nether deve vir verdadeiro");
+        assertNotNull(config.moduleKeybinds, "moduleKeybinds não deve ser nulo");
+        assertTrue(config.moduleKeybinds.isEmpty(), "Módulos devem vir sem atalhos individuais por padrão");
     }
 
     @Test

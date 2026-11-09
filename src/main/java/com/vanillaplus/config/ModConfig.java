@@ -56,6 +56,9 @@ public class ModConfig {
     public boolean cropIndicatorRequireFarmingItem = false;
     public boolean cropIndicatorShowNetherWart = true;
 
+    public java.util.Map<String, Integer> moduleKeybinds = new java.util.HashMap<>();
+    public boolean defaultBindsCleared = false;
+
     public ModConfig() {
     }
 }
