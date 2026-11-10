@@ -50,14 +50,6 @@ jobs:
           name: VanillaPlus ${{ github.ref_name }}
           generate_release_notes: true
           body: |
-            [![Minecraft](https://img.shields.io/badge/Minecraft-26.3-46B431?style=flat&logo=minecraft&logoColor=white)](https://www.minecraft.net/)
-            [![Fabric Loader](https://img.shields.io/badge/Fabric_Loader-0.20.1-DBD0C0?style=flat&logo=fabric&logoColor=black)](https://fabricmc.net/)
-            [![Java](https://img.shields.io/badge/Java-25-ED8B00?style=flat&logo=openjdk&logoColor=white)](https://openjdk.org/)
-            [![Cloth Config](https://img.shields.io/badge/Cloth_Config-26.3-black?style=flat)](https://github.com/shedaniel/cloth-config)
-            [![ModMenu](https://img.shields.io/badge/ModMenu-21.0-blue?style=flat)](https://github.com/TerraformersMC/ModMenu)
-
-            ---
-
             ### Pré-requisitos e Compatibilidade
 
             | Componente | Versão Suportada | Tipo |
@@ -80,6 +72,7 @@ jobs:
 
             > [!NOTE]
             > Este mod opera exclusivamente no lado do cliente (*client-side*). Nenhuma modificação é necessária no servidor.
+
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
