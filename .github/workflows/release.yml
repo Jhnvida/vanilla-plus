@@ -50,19 +50,36 @@ jobs:
           name: VanillaPlus ${{ github.ref_name }}
           generate_release_notes: true
           body: |
-            ## VanillaPlus ${{ github.ref_name }}
-
-            ### 📌 Requisitos de Instalação (Minecraft 26.3):
-            - **[Fabric Loader](https://fabricmc.net/use/installer/)** (>= 0.19.5)
-            - **Java 25** ou superior
-            - **[Fabric API](https://modrinth.com/mod/fabric-api)** (Obrigatório)
-            - **[Cloth Config API](https://modrinth.com/mod/cloth-config)** (Obrigatório para a tela de configurações)
-            - **[Mod Menu](https://modrinth.com/mod/modmenu)** (Opcional, recomendado para acessar opções no menu)
+            [![Minecraft](https://img.shields.io/badge/Minecraft-26.3-46B431?style=flat&logo=minecraft&logoColor=white)](https://www.minecraft.net/)
+            [![Fabric Loader](https://img.shields.io/badge/Fabric_Loader-0.20.1-DBD0C0?style=flat&logo=fabric&logoColor=black)](https://fabricmc.net/)
+            [![Java](https://img.shields.io/badge/Java-25-ED8B00?style=flat&logo=openjdk&logoColor=white)](https://openjdk.org/)
+            [![Cloth Config](https://img.shields.io/badge/Cloth_Config-26.3-black?style=flat)](https://github.com/shedaniel/cloth-config)
+            [![ModMenu](https://img.shields.io/badge/ModMenu-21.0-blue?style=flat)](https://github.com/TerraformersMC/ModMenu)
 
             ---
-            ### 🚀 Como Instalar:
-            1. Certifique-se de que o **Fabric Loader**, **Fabric API** e **Cloth Config API** estão instalados na sua pasta `.minecraft/mods/`.
-            2. Baixe o arquivo `.jar` anexado abaixo e coloque-o na mesma pasta `.minecraft/mods/`.
-            3. Inicie o jogo pelo perfil Fabric!
+
+            ### Pré-requisitos e Compatibilidade
+
+            | Componente | Versão Suportada | Tipo |
+            | :--- | :--- | :--- |
+            | **Minecraft** | `26.3` | Jogo Base |
+            | **Fabric Loader** | `>= 0.19.5` | Carregador de Mod |
+            | **Fabric API** | Compatível com 26.3 | Biblioteca Obrigatória |
+            | **Cloth Config API** | `>= 26.3.158` | Biblioteca Obrigatória |
+            | **Java Runtime** | `>= 25` | Ambiente de Execução |
+            | **ModMenu** | `>= 21.0.0` | Opcional (Menu in-game) |
+
+            ---
+
+            ### Procedimento de Instalação
+
+            1. Faça o download do arquivo `.jar` disponível abaixo na seção **Assets**.
+            2. Certifique-se de que o **Fabric Loader**, **Fabric API** e **Cloth Config API** estejam instalados no seu inicializador.
+            3. Mova o arquivo binário `.jar` para o diretório `.minecraft/mods/`.
+            4. Inicie o jogo selecionando o perfil do Fabric.
+
+            > [!NOTE]
+            > Este mod opera exclusivamente no lado do cliente (*client-side*). Nenhuma modificação é necessária no servidor.
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
