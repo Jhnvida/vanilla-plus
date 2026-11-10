@@ -176,7 +176,7 @@ public class AutoMineModule extends Module {
         if (state == MineState.SELECTING_POS1) {
             pos1 = pos;
             state = MineState.SELECTING_POS2;
-            client.player.sendSystemMessage(
+            player.sendSystemMessage(
                     Component.literal("§a[Auto Mine] Ponto 1 definido em " + pos.toShortString()
                             + ". Agora clique no Ponto 2 (final)!"));
             return InteractionResult.SUCCESS;
@@ -184,7 +184,7 @@ public class AutoMineModule extends Module {
             pos2 = pos;
             state = MineState.MINING;
             recalculateTotalBlocks();
-            client.player.sendSystemMessage(
+            player.sendSystemMessage(
                     Component.literal("§a[Auto Mine] Ponto 2 definido em " + pos.toShortString()
                             + ". Iniciando escavação (" + totalBlocksInArea + " blocos no total)!"));
             return InteractionResult.SUCCESS;
@@ -213,27 +213,28 @@ public class AutoMineModule extends Module {
 
         ModConfig config = ConfigManager.getConfig();
 
-        if (currentMiningPos != null) {
-            BlockState currentState = level.getBlockState(currentMiningPos);
+        BlockPos currentPos = this.currentMiningPos;
+        if (currentPos != null) {
+            BlockState currentState = level.getBlockState(currentPos);
             if (currentState.isAir()) {
-                currentMiningPos = null;
+                this.currentMiningPos = null;
                 minedBlocksCount++;
                 delayCooldown = config.autoMineDelayTicks;
                 gameMode.stopDestroyBlock();
             } else {
-                if (isBlockWithinReach(player, currentMiningPos, config.autoMineRange)) {
+                if (isBlockWithinReach(player, currentPos, config.autoMineRange)) {
                     if (config.autoMineAutoTool) {
                         int bestSlot = AutoToolModule.findBestToolSlot(player, currentState, config);
                         if (bestSlot != -1 && bestSlot != player.getInventory().getSelectedSlot()) {
                             player.getInventory().setSelectedSlot(bestSlot);
                         }
                     }
-                    gameMode.continueDestroyBlock(currentMiningPos, Direction.UP);
+                    gameMode.continueDestroyBlock(currentPos, Direction.UP);
                     player.swing(InteractionHand.MAIN_HAND, player.getMainHandItem().getAttackAnimation(), false);
                     return;
                 } else {
                     gameMode.stopDestroyBlock();
-                    currentMiningPos = null;
+                    this.currentMiningPos = null;
                 }
             }
         }
@@ -274,20 +275,24 @@ public class AutoMineModule extends Module {
         Minecraft client = Minecraft.getInstance();
         HitResult hit = client.hitResult;
 
-        if (pos1 != null && pos2 == null) {
-            Gizmos.cuboid(new AABB(pos1), GizmoStyle.strokeAndFill(0xFF00FF88, 2.0f, 0x3000FF88), false);
-            if (hit instanceof BlockHitResult blockHit && !blockHit.getBlockPos().equals(pos1)) {
-                AABB previewBox = createAABB(pos1, blockHit.getBlockPos());
+        BlockPos p1 = this.pos1;
+        BlockPos p2 = this.pos2;
+
+        if (p1 != null && p2 == null) {
+            Gizmos.cuboid(new AABB(p1), GizmoStyle.strokeAndFill(0xFF00FF88, 2.0f, 0x3000FF88), false);
+            if (hit instanceof BlockHitResult blockHit && !blockHit.getBlockPos().equals(p1)) {
+                AABB previewBox = createAABB(p1, blockHit.getBlockPos());
                 Gizmos.cuboid(previewBox, GizmoStyle.stroke(0x80FFFFFF, 1.5f), false);
             }
         }
 
-        if (pos1 != null && pos2 != null) {
-            AABB areaBox = createAABB(pos1, pos2);
+        if (p1 != null && p2 != null) {
+            AABB areaBox = createAABB(p1, p2);
             Gizmos.cuboid(areaBox, GizmoStyle.strokeAndFill(0xCC3388FF, 2.0f, 0x183388FF), false);
 
-            if (currentMiningPos != null) {
-                Gizmos.cuboid(new AABB(currentMiningPos), GizmoStyle.strokeAndFill(0xFFFFBB00, 2.5f, 0x55FFBB00),
+            BlockPos currentPos = this.currentMiningPos;
+            if (currentPos != null) {
+                Gizmos.cuboid(new AABB(currentPos), GizmoStyle.strokeAndFill(0xFFFFBB00, 2.5f, 0x55FFBB00),
                         false);
             }
         }
@@ -304,7 +309,9 @@ public class AutoMineModule extends Module {
     }
 
     private void recalculateTotalBlocks() {
-        if (pos1 == null || pos2 == null) {
+        BlockPos p1 = this.pos1;
+        BlockPos p2 = this.pos2;
+        if (p1 == null || p2 == null) {
             totalBlocksInArea = 0;
             return;
         }
@@ -315,12 +322,12 @@ public class AutoMineModule extends Module {
         }
 
         int count = 0;
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int maxX = Math.max(pos1.getX(), pos2.getX());
-        int minY = Math.min(pos1.getY(), pos2.getY());
-        int maxY = Math.max(pos1.getY(), pos2.getY());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+        int minX = Math.min(p1.getX(), p2.getX());
+        int maxX = Math.max(p1.getX(), p2.getX());
+        int minY = Math.min(p1.getY(), p2.getY());
+        int maxY = Math.max(p1.getY(), p2.getY());
+        int minZ = Math.min(p1.getZ(), p2.getZ());
+        int maxZ = Math.max(p1.getZ(), p2.getZ());
 
         for (int y = maxY; y >= minY; y--) {
             for (int x = minX; x <= maxX; x++) {
@@ -337,7 +344,9 @@ public class AutoMineModule extends Module {
     }
 
     private int countRemainingBlocks() {
-        if (pos1 == null || pos2 == null) {
+        BlockPos p1 = this.pos1;
+        BlockPos p2 = this.pos2;
+        if (p1 == null || p2 == null) {
             return 0;
         }
         Minecraft client = Minecraft.getInstance();
@@ -347,12 +356,12 @@ public class AutoMineModule extends Module {
         }
 
         int count = 0;
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int maxX = Math.max(pos1.getX(), pos2.getX());
-        int minY = Math.min(pos1.getY(), pos2.getY());
-        int maxY = Math.max(pos1.getY(), pos2.getY());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+        int minX = Math.min(p1.getX(), p2.getX());
+        int maxX = Math.max(p1.getX(), p2.getX());
+        int minY = Math.min(p1.getY(), p2.getY());
+        int maxY = Math.max(p1.getY(), p2.getY());
+        int minZ = Math.min(p1.getZ(), p2.getZ());
+        int maxZ = Math.max(p1.getZ(), p2.getZ());
 
         for (int y = maxY; y >= minY; y--) {
             for (int x = minX; x <= maxX; x++) {
@@ -368,17 +377,20 @@ public class AutoMineModule extends Module {
         return count;
     }
 
+    @SuppressWarnings("null")
     private @Nullable BlockPos findNextBlockToMine(LocalPlayer player, ClientLevel level, ModConfig config) {
-        if (pos1 == null || pos2 == null) {
+        BlockPos p1 = this.pos1;
+        BlockPos p2 = this.pos2;
+        if (p1 == null || p2 == null) {
             return null;
         }
 
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int maxX = Math.max(pos1.getX(), pos2.getX());
-        int minY = Math.min(pos1.getY(), pos2.getY());
-        int maxY = Math.max(pos1.getY(), pos2.getY());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+        int minX = Math.min(p1.getX(), p2.getX());
+        int maxX = Math.max(p1.getX(), p2.getX());
+        int minY = Math.min(p1.getY(), p2.getY());
+        int maxY = Math.max(p1.getY(), p2.getY());
+        int minZ = Math.min(p1.getZ(), p2.getZ());
+        int maxZ = Math.max(p1.getZ(), p2.getZ());
 
         for (int y = maxY; y >= minY; y--) {
             List<BlockPos> layerCandidates = new ArrayList<>();
@@ -411,7 +423,7 @@ public class AutoMineModule extends Module {
             return false;
         }
 
-        if (state.liquid()) {
+        if (!state.getFluidState().isEmpty()) {
             return false;
         }
 

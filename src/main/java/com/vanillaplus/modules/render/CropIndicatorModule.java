@@ -29,7 +29,6 @@ import net.minecraft.world.level.block.PotatoBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,6 +45,7 @@ public class CropIndicatorModule extends Module {
                 ModuleCategory.RENDER);
     }
 
+    @SuppressWarnings("null")
     public void renderOverlay(LevelRenderContext context) {
         if (!ConfigManager.getConfig().cropIndicatorEnabled) {
             return;
@@ -69,9 +69,6 @@ public class CropIndicatorModule extends Module {
         BlockPos playerPos = player.blockPosition();
 
         Vec3 cameraPos = context.levelState().cameraRenderState.pos;
-        if (cameraPos == null) {
-            cameraPos = player.getEyePosition();
-        }
 
         List<BlockPos> matureCrops = new ArrayList<>();
         int radSq = radius * radius;
@@ -105,9 +102,6 @@ public class CropIndicatorModule extends Module {
         ItemModelResolver resolver = client.getItemModelResolver();
         SubmitNodeCollector submitNodes = context.submitNodeCollector();
         PoseStack poseStack = context.poseStack();
-        if (poseStack == null) {
-            poseStack = new PoseStack();
-        }
 
         long now = System.currentTimeMillis();
         double bobOffset = Math.sin((now % 2400) / 2400.0 * Math.PI * 2) * 0.04;

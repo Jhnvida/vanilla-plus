@@ -3,11 +3,13 @@ package com.vanillaplus.core;
 import com.vanillaplus.keybinds.KeybindManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+@NullMarked
 public class ModuleManager {
     private static final Logger LOGGER = LoggerFactory.getLogger("VanillaPlus/ModuleManager");
     private final Map<String, Module> modules = new LinkedHashMap<>();

@@ -15,8 +15,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.gizmos.GizmoStyle;
-import net.minecraft.gizmos.Gizmos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.chicken.Chicken;
@@ -64,11 +62,6 @@ public class AutoBreedIndicatorModule extends Module {
                 animal -> AutoBreedModule.isReadyForBreeding(animal, config, player,
                         config.autoBreedIndicatorRequireFood));
 
-        BreedIndicatorStyle style = config.breedIndicatorStyle;
-        if (style == null) {
-            style = BreedIndicatorStyle.ITEM_3D;
-        }
-
         long now = System.currentTimeMillis();
         double bobOffset = Math.sin((now % 2400) / 2400.0 * Math.PI * 2) * 0.08;
         float spinDegrees = (float) ((now % 3600) / 3600.0 * 360.0);
@@ -93,32 +86,24 @@ public class AutoBreedIndicatorModule extends Module {
             Vec3 animalPos = new Vec3(animalX, animalY, animalZ);
             double targetY = animalPos.y + animal.getBbHeight() + 0.65 + bobOffset;
 
-            if (style == BreedIndicatorStyle.ITEM_3D) {
-                ItemStack foodStack = getFoodItemForAnimal(animal, player);
-                if (!foodStack.isEmpty()) {
-                    itemRenderState.clear();
-                    resolver.updateForLiving(itemRenderState, foodStack, ItemDisplayContext.GROUND, animal);
+            ItemStack foodStack = getFoodItemForAnimal(animal, player);
+            if (!foodStack.isEmpty()) {
+                itemRenderState.clear();
+                resolver.updateForLiving(itemRenderState, foodStack, ItemDisplayContext.GROUND, animal);
 
-                    if (!itemRenderState.isEmpty()) {
-                        double relX = animalPos.x - cameraPos.x;
-                        double relY = targetY - cameraPos.y;
-                        double relZ = animalPos.z - cameraPos.z;
+                if (!itemRenderState.isEmpty()) {
+                    double relX = animalPos.x - cameraPos.x;
+                    double relY = targetY - cameraPos.y;
+                    double relZ = animalPos.z - cameraPos.z;
 
-                        poseStack.pushPose();
-                        poseStack.translate(relX, relY, relZ);
-                        poseStack.rotateDegrees(Axis.YP, spinDegrees);
-                        poseStack.scale(0.70f, 0.70f, 0.70f);
+                    poseStack.pushPose();
+                    poseStack.translate(relX, relY, relZ);
+                    poseStack.rotateDegrees(Axis.YP, spinDegrees);
+                    poseStack.scale(0.70f, 0.70f, 0.70f);
 
-                        itemRenderState.submit(poseStack, submitNodes, 0x00F000F0, OverlayTexture.NO_OVERLAY, 0);
-                        poseStack.popPose();
-                    }
+                    itemRenderState.submit(poseStack, submitNodes, 0x00F000F0, OverlayTexture.NO_OVERLAY, 0);
+                    poseStack.popPose();
                 }
-            } else if (style == BreedIndicatorStyle.OUTLINE) {
-                double dx = animalPos.x - animal.getX();
-                double dy = animalPos.y - animal.getY();
-                double dz = animalPos.z - animal.getZ();
-                AABB expandedBox = animal.getBoundingBox().move(dx, dy, dz).inflate(0.12, 0.08, 0.12);
-                Gizmos.cuboid(expandedBox, GizmoStyle.stroke(0x80FF2255, 1.5f), false);
             }
         }
     }
@@ -141,22 +126,8 @@ public class AutoBreedIndicatorModule extends Module {
             return new ItemStack(Items.CARROT);
         } else if (animal instanceof Chicken) {
             return new ItemStack(Items.WHEAT_SEEDS);
-        } else {
-            String name = animal.getType().toString().toLowerCase();
-            if (name.contains("rabbit") || name.contains("coelho")) {
-                return new ItemStack(Items.CARROT);
-            } else if (name.contains("horse") || name.contains("donkey") || name.contains("mule")) {
-                return new ItemStack(Items.GOLDEN_CARROT);
-            } else if (name.contains("cat") || name.contains("ocelot")) {
-                return new ItemStack(Items.COD);
-            } else if (name.contains("wolf")) {
-                return new ItemStack(Items.BEEF);
-            } else if (name.contains("turtle")) {
-                return new ItemStack(Items.SEAGRASS);
-            } else if (name.contains("frog")) {
-                return new ItemStack(Items.MAGMA_CREAM);
-            }
-            return new ItemStack(Items.WHEAT);
         }
+
+        return ItemStack.EMPTY;
     }
 }

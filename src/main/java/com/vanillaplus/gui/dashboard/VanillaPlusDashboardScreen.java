@@ -7,7 +7,6 @@ import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleCategory;
 import com.vanillaplus.core.ModuleManager;
 import com.vanillaplus.keybinds.KeybindManager;
-import com.vanillaplus.modules.render.BreedIndicatorStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -26,14 +25,17 @@ public class VanillaPlusDashboardScreen extends Screen {
     private final @Nullable Screen parentScreen;
     private final ModuleManager moduleManager;
 
+    // Dimensões da janela modal (centralizada, compacta e proporcional)
     private int dialogWidth = 490;
     private int dialogHeight = 300;
     private int dialogX;
     private int dialogY;
 
+    // Constantes de layout
     private static final int HEADER_HEIGHT = 32;
     private static final int FOOTER_HEIGHT = 18;
 
+    // Abas de categorias
     public enum DashboardTab {
         AUTOMATION(ModuleCategory.AUTOMATION, "Automação"),
         MOVEMENT(ModuleCategory.MOVEMENT, "Movimentação"),
@@ -59,17 +61,22 @@ public class VanillaPlusDashboardScreen extends Screen {
 
     private DashboardTab currentTab = DashboardTab.ALL;
 
+    // Rolagem
     private double gridScroll = 0;
     private int maxGridScroll = 0;
     private double drawerScroll = 0;
     private int maxDrawerScroll = 0;
 
+    // Módulo selecionado no painel direito
     private @Nullable String selectedModuleId = null;
 
+    // Estado de escuta de tecla para atalho
     private @Nullable String listeningModuleId = null;
 
+    // Slider ativo em arraste
     private @Nullable String activeSliderId = null;
 
+    // Cores do tema escuro moderno
     private static final int COLOR_BG_BACKDROP = 0xA008080C;
     private static final int COLOR_WINDOW_BG = 0xFF111216;
     private static final int COLOR_WINDOW_BORDER = 0xFF1F222B;
@@ -115,9 +122,24 @@ public class VanillaPlusDashboardScreen extends Screen {
         this.dialogX = (this.width - dialogWidth) / 2;
         this.dialogY = (this.height - dialogHeight) / 2;
 
-        List<Module> modules = getFilteredModules();
-        if (!modules.isEmpty() && (selectedModuleId == null || moduleManager.getModule(selectedModuleId).isEmpty())) {
-            this.selectedModuleId = modules.getFirst().getId();
+        ModConfig config = ConfigManager.getConfig();
+
+        // 1. Restaurar última aba acessada (v2.1)
+        if (config.lastDashboardTab != null) {
+            try {
+                this.currentTab = DashboardTab.valueOf(config.lastDashboardTab);
+            } catch (Exception ignored) {
+                this.currentTab = DashboardTab.ALL;
+            }
+        }
+
+        // 2. Restaurar último módulo selecionado / interagido (v2.1)
+        List<Module> filtered = getFilteredModules();
+        if (config.lastSelectedModuleId != null && moduleManager.getModule(config.lastSelectedModuleId).isPresent()) {
+            this.selectedModuleId = config.lastSelectedModuleId;
+        } else if (!filtered.isEmpty()) {
+            this.selectedModuleId = filtered.getFirst().getId();
+            config.lastSelectedModuleId = this.selectedModuleId;
         }
     }
 
@@ -183,7 +205,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         int textY = footerY + 5;
         guiGraphics.text(font, "Menu: [ Right Ctrl ]", dialogX + 10, textY, COLOR_TEXT_DARK, false);
 
-        String ver = "v2.0";
+        String ver = "v2.1";
         int verW = font.width(ver);
         guiGraphics.text(font, ver, dialogX + dialogWidth - verW - 10, textY, COLOR_TEXT_DARK, false);
     }
@@ -273,7 +295,7 @@ public class VanillaPlusDashboardScreen extends Screen {
 
         drawPanel(guiGraphics, cx, cy, cw, ch, bg, border);
 
-
+        // 1. Ícone '?' de ajuda/descrição com quebra de linha ajustada (máx 160px)
         int helpX = cx + 6;
         int helpY = cy + 5;
         int helpSize = 11;
@@ -292,6 +314,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             guiGraphics.setTooltipForNextFrame(font, lines, mouseX, mouseY);
         }
 
+        // 2. Switch iOS moderno
         int switchW = 20;
         int switchH = 11;
         int switchX = cx + cw - switchW - 6;
@@ -301,7 +324,7 @@ public class VanillaPlusDashboardScreen extends Screen {
 
         drawToggle(guiGraphics, switchX, switchY, m.isEnabled(), switchHover);
 
-
+        // 3. Nome do módulo
         String displayName = m.getName();
         int maxNameWidth = cw - 44;
         if (font.width(displayName) > maxNameWidth) {
@@ -309,6 +332,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         }
         guiGraphics.text(font, displayName, cx + 6, cy + ch - 13, COLOR_TEXT_WHITE, false);
 
+        // 4. Badge de Atalho
         boolean isListening = m.getId().equals(listeningModuleId);
         String keyText = isListening ? "..." : KeybindManager.getKeyDisplayName(m.getId());
         int keyW = font.width(keyText) + 8;
@@ -329,6 +353,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             int mouseX, int mouseY) {
         drawPanel(guiGraphics, dx, dy, dw, dh, COLOR_DRAWER_BG, COLOR_DRAWER_BORDER);
 
+        // Cabeçalho do Painel: Nome do Módulo (sem estrela)
         String title = m.getName();
         int maxTitleW = dw - 16;
         if (font.width(title) > maxTitleW) {
@@ -345,6 +370,7 @@ public class VanillaPlusDashboardScreen extends Screen {
 
         int curY = optY + 6 - (int) drawerScroll;
 
+        // Seção 1: Atalho (Hotkey)
         guiGraphics.text(font, "Atalho de Teclado:", dx + 8, curY, COLOR_TEXT_MUTED, false);
         curY += 12;
 
@@ -389,6 +415,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         }
     }
 
+    @SuppressWarnings("null")
     private int renderModuleSpecificDrawerSettings(GuiGraphicsExtractor guiGraphics, Module m, int sx, int sy, int sw,
             int mouseX, int mouseY) {
         ModConfig config = ConfigManager.getConfig();
@@ -410,17 +437,11 @@ public class VanillaPlusDashboardScreen extends Screen {
                 guiGraphics.fill(sx, sy + 2, sx + sw, sy + 3, COLOR_DRAWER_BORDER);
                 sy += 8;
 
+                // Indicador Visual de Animais
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Indicador Visual", config.autoBreedIndicatorEnabled,
                         mouseX, mouseY);
 
                 if (config.autoBreedIndicatorEnabled) {
-                    guiGraphics.text(font, "Estilo do Indicador:", sx, sy, COLOR_TEXT_MUTED, false);
-                    sy += 11;
-                    String styleName = (config.breedIndicatorStyle == BreedIndicatorStyle.ITEM_3D) ? "Modelo 3D"
-                            : "Caixa ESP";
-                    drawPillButton(guiGraphics, sx, sy, font.width(styleName) + 12, 13, styleName, mouseX, mouseY);
-                    sy += 16;
-
                     sy = drawSliderControl(guiGraphics, sx, sy, sw, "b_ind_radius", "Raio do Indicador",
                             config.autoBreedIndicatorRange + "m",
                             (float) ((config.autoBreedIndicatorRange - 4) / 28.0), mouseX, mouseY);
@@ -556,6 +577,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         guiGraphics.text(font, text, x + (w - tW) / 2, y + 3, COLOR_TEXT_WHITE, false);
     }
 
+    // --- MÉTODOS AUXILIARES DE DESENHO VISUAL ---
 
     private void drawPanel(GuiGraphicsExtractor guiGraphics, int x, int y, int w, int h, int bg, int border) {
         guiGraphics.fill(x, y, x + w, y + h, bg);
@@ -587,6 +609,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         guiGraphics.fill(knobX, knobY, knobX + knobSize, knobY + knobSize, knobColor);
     }
 
+    // --- EVENTOS DE INTERAÇÃO (CLIQUE, DRAG, TECLAS) ---
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean isDouble) {
@@ -601,6 +624,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         int mx = (int) event.x();
         int my = (int) event.y();
 
+        // 1. Botão Fechar Janela [✕]
         int closeX = dialogX + dialogWidth - 22;
         int closeY = dialogY + 8;
         if (mx >= closeX && mx <= closeX + 16 && my >= closeY && my <= closeY + 16) {
@@ -608,6 +632,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             return true;
         }
 
+        // 2. Abas de Categorias (iniciam à esquerda)
         int tabStartX = dialogX + 10;
         int tabY = dialogY + 7;
         int tabH = 18;
@@ -617,10 +642,18 @@ public class VanillaPlusDashboardScreen extends Screen {
             if (mx >= tabStartX && mx <= tabStartX + tabW && my >= tabY && my <= tabY + tabH) {
                 this.currentTab = tab;
                 this.gridScroll = 0;
+                ModConfig config = ConfigManager.getConfig();
+                config.lastDashboardTab = tab.name();
                 List<Module> filtered = getFilteredModules();
                 if (!filtered.isEmpty()) {
-                    this.selectedModuleId = filtered.getFirst().getId();
+                    boolean hasCurrent = selectedModuleId != null
+                            && filtered.stream().anyMatch(m -> m.getId().equals(selectedModuleId));
+                    if (!hasCurrent) {
+                        this.selectedModuleId = filtered.getFirst().getId();
+                        config.lastSelectedModuleId = this.selectedModuleId;
+                    }
                 }
+                ConfigManager.save();
                 return true;
             }
             tabStartX += tabW + 5;
@@ -634,6 +667,7 @@ public class VanillaPlusDashboardScreen extends Screen {
         int rightPanelY = contentY + 3;
         int rightPanelH = contentH - 6;
 
+        // 3. Interações com o Painel de Configurações Direito
         if (selectedModuleId != null && mx >= rightPanelX && mx <= rightPanelX + rightPanelW && my >= rightPanelY
                 && my <= rightPanelY + rightPanelH) {
             Module module = moduleManager.getModule(selectedModuleId).orElse(null);
@@ -673,6 +707,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             }
         }
 
+        // 4. Interações com a Grade de Módulos (Esquerda)
         int gridX = dialogX + 8;
         int gridW = rightPanelX - gridX - 6;
         if (mx >= gridX && mx <= gridX + gridW && my >= contentY && my <= contentY + contentH) {
@@ -698,6 +733,9 @@ public class VanillaPlusDashboardScreen extends Screen {
 
                     if (mx >= switchX && mx <= switchX + switchW && my >= switchY && my <= switchY + switchH) {
                         m.toggle();
+                        selectedModuleId = m.getId();
+                        ConfigManager.getConfig().lastSelectedModuleId = m.getId();
+                        ConfigManager.save();
                         return true;
                     }
 
@@ -710,11 +748,15 @@ public class VanillaPlusDashboardScreen extends Screen {
                     if (mx >= keyX && mx <= keyX + keyW && my >= keyY && my <= keyY + keyH) {
                         selectedModuleId = m.getId();
                         listeningModuleId = m.getId();
+                        ConfigManager.getConfig().lastSelectedModuleId = m.getId();
+                        ConfigManager.save();
                         return true;
                     }
 
                     selectedModuleId = m.getId();
                     listeningModuleId = null;
+                    ConfigManager.getConfig().lastSelectedModuleId = m.getId();
+                    ConfigManager.save();
                     return true;
                 }
             }
@@ -750,6 +792,7 @@ public class VanillaPlusDashboardScreen extends Screen {
                 }
                 sy += 23;
 
+                // Toggle Indicador Visual
                 if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 14) {
                     config.autoBreedIndicatorEnabled = !config.autoBreedIndicatorEnabled;
                     ConfigManager.save();
@@ -758,17 +801,6 @@ public class VanillaPlusDashboardScreen extends Screen {
                 sy += 15;
 
                 if (config.autoBreedIndicatorEnabled) {
-                    sy += 11;
-                    int styleW = 75;
-                    if (mx >= sx && mx <= sx + styleW && my >= sy && my <= sy + 13) {
-                        config.breedIndicatorStyle = (config.breedIndicatorStyle == BreedIndicatorStyle.ITEM_3D)
-                                ? BreedIndicatorStyle.OUTLINE
-                                : BreedIndicatorStyle.ITEM_3D;
-                        ConfigManager.save();
-                        return;
-                    }
-                    sy += 16;
-
                     if (mx >= sx && mx <= sx + sw && my >= sy + 11 && my <= sy + 21) {
                         activeSliderId = "b_ind_radius";
                         updateSliderValue("b_ind_radius", (float) (mx - sx) / sw);
@@ -925,7 +957,8 @@ public class VanillaPlusDashboardScreen extends Screen {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-        if (activeSliderId != null) {
+        String sliderId = this.activeSliderId;
+        if (sliderId != null) {
             int mx = (int) event.x();
             int rightPanelW = 185;
             int rightPanelX = dialogX + dialogWidth - rightPanelW - 6;
@@ -933,7 +966,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             int sw = rightPanelW - 16;
 
             float ratio = (float) (mx - sx) / (float) sw;
-            updateSliderValue(activeSliderId, ratio);
+            updateSliderValue(sliderId, ratio);
             return true;
         }
         return super.mouseDragged(event, dx, dy);
@@ -972,7 +1005,8 @@ public class VanillaPlusDashboardScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (listeningModuleId != null) {
+        String listeningId = this.listeningModuleId;
+        if (listeningId != null) {
             int keyCode = event.key();
 
             if (keyCode == InputConstants.KEY_ESCAPE) {
@@ -981,12 +1015,12 @@ public class VanillaPlusDashboardScreen extends Screen {
             }
 
             if (keyCode == InputConstants.KEY_BACKSPACE || keyCode == InputConstants.KEY_DELETE) {
-                KeybindManager.removeModuleKey(listeningModuleId);
+                KeybindManager.removeModuleKey(listeningId);
                 this.listeningModuleId = null;
                 return true;
             }
 
-            KeybindManager.setModuleKey(listeningModuleId, keyCode);
+            KeybindManager.setModuleKey(listeningId, keyCode);
             this.listeningModuleId = null;
             return true;
         }

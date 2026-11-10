@@ -5,6 +5,9 @@ bin/
 out/
 logs/
 run/
+.fabric/
+crash-reports/
+*.log
 
 # Documentação interna de desenvolvimento
 docs/
@@ -13,11 +16,19 @@ TODO.md
 # IDEs e editores
 .idea/
 *.iml
+*.ipr
+*.iws
 .vscode/
 .settings/
 .classpath
 .project
 
-# Sistema operacional
+# Sistema operacional e temporários
 .DS_Store
 Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+*.swp
+*~
+

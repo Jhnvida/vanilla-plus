@@ -207,7 +207,7 @@ Para compilar e executar o projeto localmente, certifique-se de possuir:
     .\gradlew.bat build
     ```
 
-    O artefato final será gerado no diretório `build/libs/vanillaplus-2.0.0.jar`.
+    O artefato final será gerado no diretório `build/libs/vanillaplus-2.1.0.jar`.
 
 4. **Inicie o cliente de desenvolvimento:**
 

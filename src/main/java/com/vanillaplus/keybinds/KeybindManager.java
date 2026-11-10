@@ -124,6 +124,7 @@ public class KeybindManager {
         saveMinecraftOptions();
     }
 
+    @SuppressWarnings("null")
     public static String getKeyDisplayName(String moduleId) {
         KeyMapping mapping = MODULE_KEYMAPS.get(moduleId);
         if (mapping == null || mapping.isUnbound()) {

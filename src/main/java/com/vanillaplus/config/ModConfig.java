@@ -59,6 +59,10 @@ public class ModConfig {
     public java.util.Map<String, Integer> moduleKeybinds = new java.util.HashMap<>();
     public boolean defaultBindsCleared = false;
 
+    // Memória de navegação do menu (v2.1)
+    public String lastDashboardTab = "ALL";
+    public String lastSelectedModuleId = "auto_breed";
+
     public ModConfig() {
     }
 }

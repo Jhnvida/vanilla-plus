@@ -41,7 +41,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        LOGGER.info("Inicializando VanillaPlus 2.0 para Minecraft 26.3...");
+        LOGGER.info("Inicializando VanillaPlus 2.1 para Minecraft 26.3...");
 
         ConfigManager.load();
         ModConfig config = ConfigManager.getConfig();
