@@ -54,6 +54,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Fullbright:** Iluminação nítida para exploração subterrânea sem alteração de pacotes no servidor.
 - **Light Level Overlay:** Marcadores no chão indicando condições de luz propícias para o surgimento de monstros hostis.
 - **Mob ESP (Detecção 3D de Inimigos):** Contorno tridimensional (hitbox) límpido e etiquetas de texto flutuantes (nome, distância, vida) visíveis através de blocos via Gizmos nativos, com filtros individuais e escala responsiva.
+- **Portal ESP (Localizador de Portais 3D):** Identifica portais do Nether e do End através de blocos com caixa unificada, feixe indicador vertical (beacon beam) e medidor de distância em tempo real.
 
 ---
 
@@ -78,6 +79,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Fullbright:** Ajusta dinamicamente a tabela de iluminação local para permitir visão clara em ambientes escuros e cavernas.
 - **Light Level Overlay:** Renderiza cruzes visuais sobre blocos geráveis indicando zonas com nível de iluminação zero propícias ao spawn de monstros.
 - **Mob ESP:** Renderiza caixas 3D (bounding boxes) e etiquetas flutuantes de identificação de mobs inimigos (com escala responsiva adaptativa à distância, Always On Top e filtros granulares por criatura).
+- **Portal ESP:** Destaca estruturas de portais do Nether e do End com caixa 3D envolvente, feixe vertical orientador e distância em metros, prevenindo a perda do ponto de retorno em explorações.
 
 ---
 

@@ -53,6 +53,10 @@ public class ConfigManagerTest {
         assertTrue(config.mobEspCreeper, "Filtro de Creeper deve vir ativo");
         assertTrue(config.mobEspSkeleton, "Filtro de Esqueleto deve vir ativo");
         assertTrue(config.mobEspZombie, "Filtro de Zumbi deve vir ativo");
+        assertFalse(config.portalEspEnabled, "PortalESP deve iniciar desativado");
+        assertEquals(64, config.portalEspRadius, "Raio do PortalESP deve ser 64m");
+        assertTrue(config.portalEspNether, "PortalESP Nether deve vir ativo");
+        assertTrue(config.portalEspEnd, "PortalESP End deve vir ativo");
         assertNotNull(config.moduleKeybinds, "moduleKeybinds não deve ser nulo");
         assertTrue(config.moduleKeybinds.isEmpty(), "Módulos devem vir sem atalhos individuais por padrão");
     }

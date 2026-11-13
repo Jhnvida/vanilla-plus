@@ -78,6 +78,13 @@ public class ModConfig {
     public boolean mobEspOther = true;
     public boolean mobEspPlayers = false;
 
+    public boolean portalEspEnabled = false;
+    public int portalEspRadius = 64;
+    public boolean portalEspNether = true;
+    public boolean portalEspEnd = true;
+    public boolean portalEspShowDistance = true;
+    public boolean portalEspBoxFill = true;
+
     public java.util.Map<String, Integer> moduleKeybinds = new java.util.HashMap<>();
     public boolean defaultBindsCleared = false;
 

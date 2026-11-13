@@ -123,14 +123,27 @@ public class MobEspModule extends Module {
 
             double distance = Math.sqrt(distSq);
             String label = formatEntityLabel(entity, distance, config);
+            boolean showHearts = config.mobEspShowHealth && entity.getMaxHealth() > 0;
+            String hearts = showHearts ? formatHearts(entity.getHealth(), entity.getMaxHealth()) : "";
+
+            float textScale = calculateLabelScale(distance, config);
 
             if (!label.isEmpty()) {
-                float textScale = calculateLabelScale(distance, config);
-                Vec3 textPos = new Vec3(interpX, box.maxY + 0.15 + (textScale * 0.35), interpZ);
+                Vec3 textPos = new Vec3(interpX, box.maxY + 0.18 + (textScale * 0.25), interpZ);
                 Gizmos.billboardText(
                         label,
                         textPos,
                         TextGizmo.Style.forColorAndCentered(color).withScale(textScale))
+                        .setAlwaysOnTop();
+            }
+
+            if (!hearts.isEmpty()) {
+                double heartsYOffset = !label.isEmpty() ? 0.24 + (textScale * 0.22) : 0.0;
+                Vec3 heartsPos = new Vec3(interpX, box.maxY + 0.18 + (textScale * 0.25) + heartsYOffset, interpZ);
+                Gizmos.billboardText(
+                        hearts,
+                        heartsPos,
+                        TextGizmo.Style.whiteAndCentered().withScale(textScale * 0.90f))
                         .setAlwaysOnTop();
             }
         }
@@ -139,12 +152,11 @@ public class MobEspModule extends Module {
     public static float calculateLabelScale(double distance, ModConfig config) {
         float baseMultiplier = Math.clamp(config.mobEspTextScale, 0.4f, 2.5f);
         if (!config.mobEspResponsiveText) {
-            return 0.30f * baseMultiplier;
+            return 0.32f * baseMultiplier;
         }
 
-        float factor = 0.026f;
-        float responsive = (float) (distance * factor);
-        float clamped = Math.clamp(responsive, 0.07f, 0.70f);
+        float responsive = (float) (0.25f + (distance * 0.015f));
+        float clamped = Math.clamp(responsive, 0.25f, 0.75f);
         return clamped * baseMultiplier;
     }
 
@@ -263,13 +275,28 @@ public class MobEspModule extends Module {
             sb.append("[").append((int) Math.round(distance)).append("m]");
         }
 
-        if (config.mobEspShowHealth) {
-            if (!sb.isEmpty()) {
-                sb.append(" ");
+        return Objects.requireNonNull(sb.toString());
+    }
+
+    public static String formatHearts(float health, float maxHealth) {
+        if (maxHealth <= 0) {
+            return "";
+        }
+
+        int totalHearts = 10;
+        double healthPercent = Math.clamp((double) health / maxHealth, 0.0, 1.0);
+        double activeHearts = healthPercent * totalHearts;
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < totalHearts; i++) {
+            double diff = activeHearts - i;
+            if (diff >= 0.75) {
+                sb.append("§c❤");
+            } else if (diff >= 0.25) {
+                sb.append("§6❤");
+            } else {
+                sb.append("§8❤");
             }
-            int hp = (int) Math.ceil(entity.getHealth());
-            int maxHp = (int) Math.ceil(entity.getMaxHealth());
-            sb.append("(").append(hp).append("/").append(maxHp).append(")");
         }
 
         return Objects.requireNonNull(sb.toString());

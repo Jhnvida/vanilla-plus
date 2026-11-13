@@ -30,6 +30,7 @@ public class KeybindManager {
     private static @Nullable KeyMapping toggleFullbrightKey;
     private static @Nullable KeyMapping toggleLightLevelKey;
     private static @Nullable KeyMapping toggleMobEspKey;
+    private static @Nullable KeyMapping togglePortalEspKey;
     private static @Nullable KeyMapping toggleAutoMineKey;
     private static @Nullable KeyMapping resetAutoMineKey;
 
@@ -51,6 +52,7 @@ public class KeybindManager {
         toggleFullbrightKey = registerModuleMapping("fullbright", "key.vanillaplus.toggle_fullbright");
         toggleLightLevelKey = registerModuleMapping("light_level_overlay", "key.vanillaplus.toggle_light_level");
         toggleMobEspKey = registerModuleMapping("mob_esp", "key.vanillaplus.toggle_mob_esp");
+        togglePortalEspKey = registerModuleMapping("portal_esp", "key.vanillaplus.toggle_portal_esp");
         toggleAutoMineKey = registerModuleMapping("auto_mine", "key.vanillaplus.toggle_auto_mine");
         resetAutoMineKey = registerModuleMapping("auto_mine_reset", "key.vanillaplus.reset_auto_mine");
 
@@ -225,6 +227,10 @@ public class KeybindManager {
 
     public static @Nullable KeyMapping getToggleMobEspKey() {
         return toggleMobEspKey;
+    }
+
+    public static @Nullable KeyMapping getTogglePortalEspKey() {
+        return togglePortalEspKey;
     }
 
     public static @Nullable KeyMapping getToggleAutoMineKey() {

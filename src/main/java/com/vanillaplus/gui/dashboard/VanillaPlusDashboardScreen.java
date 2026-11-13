@@ -508,7 +508,7 @@ public class VanillaPlusDashboardScreen extends Screen {
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Exibir Nome", config.mobEspShowName, mouseX, mouseY);
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Exibir Distância", config.mobEspShowDistance, mouseX,
                         mouseY);
-                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Exibir Vida (HP)", config.mobEspShowHealth, mouseX,
+                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Vida (Corações)", config.mobEspShowHealth, mouseX,
                         mouseY);
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Escala Responsiva", config.mobEspResponsiveText, mouseX,
                         mouseY);
@@ -547,6 +547,18 @@ public class VanillaPlusDashboardScreen extends Screen {
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Chefes (Warden/Boss)", config.mobEspBoss, mouseX, mouseY);
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Outros Monstros", config.mobEspOther, mouseX, mouseY);
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Jogadores", config.mobEspPlayers, mouseX, mouseY);
+            }
+            case "portal_esp" -> {
+                sy = drawSliderControl(guiGraphics, sx, sy, sw, "portal_esp_radius", "Raio de Busca",
+                        config.portalEspRadius + "m",
+                        (float) ((config.portalEspRadius - 16) / 144.0), mouseX, mouseY);
+
+                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Portal do Nether", config.portalEspNether, mouseX, mouseY);
+                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Portal do End", config.portalEspEnd, mouseX, mouseY);
+                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Exibir Distância", config.portalEspShowDistance, mouseX,
+                        mouseY);
+                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Preenchimento 3D", config.portalEspBoxFill, mouseX,
+                        mouseY);
             }
             default -> {
                 guiGraphics.text(font, "Sem opções adicionais.", sx, sy, COLOR_TEXT_DARK, false);
@@ -1041,6 +1053,40 @@ public class VanillaPlusDashboardScreen extends Screen {
                     sy += 15;
                 }
             }
+            case "portal_esp" -> {
+                if (mx >= sx && mx <= sx + sw && my >= sy + 11 && my <= sy + 21) {
+                    activeSliderId = "portal_esp_radius";
+                    updateSliderValue("portal_esp_radius", (float) (mx - sx) / sw);
+                    return;
+                }
+                sy += 25;
+
+                if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 14) {
+                    config.portalEspNether = !config.portalEspNether;
+                    ConfigManager.save();
+                    return;
+                }
+                sy += 15;
+
+                if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 14) {
+                    config.portalEspEnd = !config.portalEspEnd;
+                    ConfigManager.save();
+                    return;
+                }
+                sy += 15;
+
+                if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 14) {
+                    config.portalEspShowDistance = !config.portalEspShowDistance;
+                    ConfigManager.save();
+                    return;
+                }
+                sy += 15;
+
+                if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 14) {
+                    config.portalEspBoxFill = !config.portalEspBoxFill;
+                    ConfigManager.save();
+                }
+            }
         }
     }
 
@@ -1061,6 +1107,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             case "light_radius" -> config.lightLevelOverlayRadius = Math.round(4 + (ratio * 20.0f));
             case "mob_esp_range" -> config.mobEspRange = Math.round(4 + (ratio * 60.0f));
             case "mob_esp_scale" -> config.mobEspTextScale = Math.round((0.5f + (ratio * 1.5f)) * 10.0f) / 10.0f;
+            case "portal_esp_radius" -> config.portalEspRadius = Math.round(16 + (ratio * 144.0f));
         }
 
         ConfigManager.save();

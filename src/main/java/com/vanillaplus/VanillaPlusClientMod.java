@@ -16,6 +16,7 @@ import com.vanillaplus.modules.render.CropIndicatorModule;
 import com.vanillaplus.modules.render.FullbrightModule;
 import com.vanillaplus.modules.render.LightLevelOverlayModule;
 import com.vanillaplus.modules.render.MobEspModule;
+import com.vanillaplus.modules.render.PortalEspModule;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -42,7 +43,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        LOGGER.info("Inicializando VanillaPlus 2.2 para Minecraft 26.3...");
+        LOGGER.info("Inicializando VanillaPlus 2.3 para Minecraft 26.3...");
 
         ConfigManager.load();
         ModConfig config = ConfigManager.getConfig();
@@ -60,6 +61,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
         CropIndicatorModule cropIndicator = new CropIndicatorModule();
         MobEspModule mobEsp = new MobEspModule();
+        PortalEspModule portalEsp = new PortalEspModule();
 
         autoBreed.setEnabled(config.autoBreedEnabled);
         autoReplant.setEnabled(config.autoReplantEnabled);
@@ -70,6 +72,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
         autoMine.setEnabled(config.autoMineEnabled);
         mobEsp.setEnabled(config.mobEspEnabled);
+        portalEsp.setEnabled(config.portalEspEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
@@ -80,6 +83,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         moduleManager.registerModule(lightLevelOverlay);
         moduleManager.registerModule(autoMine);
         moduleManager.registerModule(mobEsp);
+        moduleManager.registerModule(portalEsp);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
         AttackBlockCallback.EVENT.register(autoMine::onAttackBlock);
@@ -92,6 +96,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         LevelRenderEvents.BEFORE_GIZMOS.register(autoMine::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(cropIndicator::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(mobEsp::renderOverlay);
+        LevelRenderEvents.BEFORE_GIZMOS.register(portalEsp::renderOverlay);
 
         KeybindManager.register();
 
