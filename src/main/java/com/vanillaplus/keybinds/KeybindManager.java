@@ -3,7 +3,6 @@ package com.vanillaplus.keybinds;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.vanillaplus.config.ConfigManager;
 import com.vanillaplus.config.ModConfig;
-import com.vanillaplus.core.Module;
 import com.vanillaplus.core.ModuleManager;
 import com.vanillaplus.gui.dashboard.VanillaPlusDashboardScreen;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -30,6 +29,7 @@ public class KeybindManager {
     private static @Nullable KeyMapping toggleAutoRefillKey;
     private static @Nullable KeyMapping toggleFullbrightKey;
     private static @Nullable KeyMapping toggleLightLevelKey;
+    private static @Nullable KeyMapping toggleMobEspKey;
     private static @Nullable KeyMapping toggleAutoMineKey;
     private static @Nullable KeyMapping resetAutoMineKey;
 
@@ -50,6 +50,7 @@ public class KeybindManager {
         toggleAutoRefillKey = registerModuleMapping("auto_refill", "key.vanillaplus.toggle_auto_refill");
         toggleFullbrightKey = registerModuleMapping("fullbright", "key.vanillaplus.toggle_fullbright");
         toggleLightLevelKey = registerModuleMapping("light_level_overlay", "key.vanillaplus.toggle_light_level");
+        toggleMobEspKey = registerModuleMapping("mob_esp", "key.vanillaplus.toggle_mob_esp");
         toggleAutoMineKey = registerModuleMapping("auto_mine", "key.vanillaplus.toggle_auto_mine");
         resetAutoMineKey = registerModuleMapping("auto_mine_reset", "key.vanillaplus.reset_auto_mine");
 
@@ -171,8 +172,8 @@ public class KeybindManager {
         }
 
         for (Map.Entry<String, KeyMapping> entry : MODULE_KEYMAPS.entrySet()) {
-            String id = entry.getKey();
-            KeyMapping key = entry.getValue();
+            String id = java.util.Objects.requireNonNull(entry.getKey());
+            KeyMapping key = java.util.Objects.requireNonNull(entry.getValue());
 
             if (!key.isUnbound()) {
                 while (key.consumeClick()) {
@@ -183,7 +184,7 @@ public class KeybindManager {
                             }
                         });
                     } else {
-                        moduleManager.getModule(id).ifPresent(Module::toggle);
+                        moduleManager.getModule(id).ifPresent(m -> m.toggle());
                     }
                 }
             }
@@ -220,6 +221,10 @@ public class KeybindManager {
 
     public static @Nullable KeyMapping getToggleLightLevelKey() {
         return toggleLightLevelKey;
+    }
+
+    public static @Nullable KeyMapping getToggleMobEspKey() {
+        return toggleMobEspKey;
     }
 
     public static @Nullable KeyMapping getToggleAutoMineKey() {

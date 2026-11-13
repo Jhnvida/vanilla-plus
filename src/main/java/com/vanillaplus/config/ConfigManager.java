@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.vanillaplus.modules.render.BreedIndicatorStyle;
+import com.vanillaplus.modules.render.MobEspColorMode;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -31,6 +32,17 @@ public class ConfigManager {
                             }
                         }
                         return BreedIndicatorStyle.ITEM_3D;
+                    })
+            .registerTypeAdapter(MobEspColorMode.class,
+                    (JsonDeserializer<MobEspColorMode>) (json, typeOfT, ctx) -> {
+                        if (json != null && json.isJsonPrimitive()) {
+                            try {
+                                return MobEspColorMode.valueOf(Objects.requireNonNull(json.getAsString()));
+                            } catch (IllegalArgumentException ignored) {
+                                return MobEspColorMode.WHITE;
+                            }
+                        }
+                        return MobEspColorMode.WHITE;
                     })
             .create());
     private static final File CONFIG_FILE = resolveConfigFile();
@@ -65,6 +77,9 @@ public class ConfigManager {
             if (loaded != null) {
                 if (loaded.breedIndicatorStyle == null) {
                     loaded.breedIndicatorStyle = com.vanillaplus.modules.render.BreedIndicatorStyle.ITEM_3D;
+                }
+                if (loaded.mobEspColorMode == null) {
+                    loaded.mobEspColorMode = com.vanillaplus.modules.render.MobEspColorMode.WHITE;
                 }
                 if (loaded.moduleKeybinds == null) {
                     loaded.moduleKeybinds = new java.util.HashMap<>();

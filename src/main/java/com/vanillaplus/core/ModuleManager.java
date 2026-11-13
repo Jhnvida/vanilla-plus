@@ -11,7 +11,7 @@ import java.util.*;
 
 @NullMarked
 public class ModuleManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger("VanillaPlus/ModuleManager");
+    private static final Logger LOGGER = Objects.requireNonNull(LoggerFactory.getLogger("VanillaPlus/ModuleManager"));
     private final Map<String, Module> modules = new LinkedHashMap<>();
 
     public ModuleManager() {
@@ -23,11 +23,11 @@ public class ModuleManager {
     }
 
     public Optional<Module> getModule(String id) {
-        return Optional.ofNullable(modules.get(id));
+        return Objects.requireNonNull(Optional.ofNullable(modules.get(id)));
     }
 
     public Collection<Module> getModules() {
-        return Collections.unmodifiableCollection(modules.values());
+        return Objects.requireNonNull(Collections.unmodifiableCollection(modules.values()));
     }
 
     public List<Module> getModulesByCategory(ModuleCategory category) {

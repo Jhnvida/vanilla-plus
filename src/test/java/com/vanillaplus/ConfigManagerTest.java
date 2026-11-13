@@ -43,6 +43,16 @@ public class ConfigManagerTest {
         assertTrue(config.cropIndicatorMaxCount >= 4, "Limite do CropIndicator deve ser no mínimo 4");
         assertFalse(config.cropIndicatorRequireFarmingItem, "Exigir item agrícola deve vir falso");
         assertTrue(config.cropIndicatorShowNetherWart, "Exibir fungo do Nether deve vir verdadeiro");
+        assertFalse(config.mobEspEnabled, "MobESP deve iniciar desativado");
+        assertTrue(config.mobEspRange >= 8, "Raio do MobESP deve ser no mínimo 8");
+        assertTrue(config.mobEspShowName, "Exibir nome no MobESP deve vir verdadeiro");
+        assertTrue(config.mobEspShowDistance, "Exibir distância no MobESP deve vir verdadeiro");
+        assertTrue(config.mobEspShowHealth, "Exibir vida no MobESP deve vir verdadeiro");
+        assertEquals(com.vanillaplus.modules.render.MobEspColorMode.WHITE, config.mobEspColorMode,
+                "Modo de cor padrão deve ser WHITE");
+        assertTrue(config.mobEspCreeper, "Filtro de Creeper deve vir ativo");
+        assertTrue(config.mobEspSkeleton, "Filtro de Esqueleto deve vir ativo");
+        assertTrue(config.mobEspZombie, "Filtro de Zumbi deve vir ativo");
         assertNotNull(config.moduleKeybinds, "moduleKeybinds não deve ser nulo");
         assertTrue(config.moduleKeybinds.isEmpty(), "Módulos devem vir sem atalhos individuais por padrão");
     }

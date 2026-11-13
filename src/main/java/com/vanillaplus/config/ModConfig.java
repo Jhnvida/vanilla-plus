@@ -56,10 +56,29 @@ public class ModConfig {
     public boolean cropIndicatorRequireFarmingItem = false;
     public boolean cropIndicatorShowNetherWart = true;
 
+    public boolean mobEspEnabled = false;
+    public int mobEspRange = 24;
+    public boolean mobEspShowName = true;
+    public boolean mobEspShowDistance = true;
+    public boolean mobEspShowHealth = true;
+    public com.vanillaplus.modules.render.MobEspColorMode mobEspColorMode = com.vanillaplus.modules.render.MobEspColorMode.WHITE;
+    public boolean mobEspCreeper = true;
+    public boolean mobEspSkeleton = true;
+    public boolean mobEspZombie = true;
+    public boolean mobEspSpider = true;
+    public boolean mobEspWitch = true;
+    public boolean mobEspEnderman = true;
+    public boolean mobEspSlime = true;
+    public boolean mobEspPhantom = true;
+    public boolean mobEspNether = true;
+    public boolean mobEspIllager = true;
+    public boolean mobEspBoss = true;
+    public boolean mobEspOther = true;
+    public boolean mobEspPlayers = false;
+
     public java.util.Map<String, Integer> moduleKeybinds = new java.util.HashMap<>();
     public boolean defaultBindsCleared = false;
 
-    // Memória de navegação do menu (v2.1)
     public String lastDashboardTab = "ALL";
     public String lastSelectedModuleId = "auto_breed";
 

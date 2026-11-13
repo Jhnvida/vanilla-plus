@@ -15,6 +15,7 @@ import com.vanillaplus.modules.render.AutoBreedIndicatorModule;
 import com.vanillaplus.modules.render.CropIndicatorModule;
 import com.vanillaplus.modules.render.FullbrightModule;
 import com.vanillaplus.modules.render.LightLevelOverlayModule;
+import com.vanillaplus.modules.render.MobEspModule;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -58,6 +59,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
 
         AutoBreedIndicatorModule breedIndicator = new AutoBreedIndicatorModule();
         CropIndicatorModule cropIndicator = new CropIndicatorModule();
+        MobEspModule mobEsp = new MobEspModule();
 
         autoBreed.setEnabled(config.autoBreedEnabled);
         autoReplant.setEnabled(config.autoReplantEnabled);
@@ -67,6 +69,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         fullbright.setEnabled(config.fullbrightEnabled);
         lightLevelOverlay.setEnabled(config.lightLevelOverlayEnabled);
         autoMine.setEnabled(config.autoMineEnabled);
+        mobEsp.setEnabled(config.mobEspEnabled);
 
         moduleManager.registerModule(autoBreed);
         moduleManager.registerModule(autoReplant);
@@ -76,6 +79,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         moduleManager.registerModule(fullbright);
         moduleManager.registerModule(lightLevelOverlay);
         moduleManager.registerModule(autoMine);
+        moduleManager.registerModule(mobEsp);
 
         UseBlockCallback.EVENT.register(autoReplant::onUseBlock);
         AttackBlockCallback.EVENT.register(autoMine::onAttackBlock);
@@ -87,6 +91,7 @@ public class VanillaPlusClientMod implements ClientModInitializer {
         LevelRenderEvents.BEFORE_GIZMOS.register(breedIndicator::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(autoMine::renderOverlay);
         LevelRenderEvents.BEFORE_GIZMOS.register(cropIndicator::renderOverlay);
+        LevelRenderEvents.BEFORE_GIZMOS.register(mobEsp::renderOverlay);
 
         KeybindManager.register();
 
