@@ -53,6 +53,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Auto Refill:** Reposição instantânea de itens ou blocos consumidos na hotbar diretamente do inventário do jogador.
 - **Fullbright:** Iluminação nítida para exploração subterrânea sem alteração de pacotes no servidor.
 - **Light Level Overlay:** Marcadores no chão indicando condições de luz propícias para o surgimento de monstros hostis.
+- **Mob ESP (Detecção 3D de Inimigos):** Contorno tridimensional (hitbox) límpido e etiquetas de texto flutuantes (nome, distância, vida) visíveis através de blocos via Gizmos nativos, com filtros individuais e escala responsiva.
 
 ---
 
@@ -76,6 +77,7 @@ O **VanillaPlus** foi projetado para aprimorar a experiência do jogador no Mine
 - **Crop Indicator:** Destaca plantações totalmente maduras com o modelo 3D flutuante do seu respectivo produto colhível, com orçamento dinâmico de renderização para preservar altas taxas de quadros.
 - **Fullbright:** Ajusta dinamicamente a tabela de iluminação local para permitir visão clara em ambientes escuros e cavernas.
 - **Light Level Overlay:** Renderiza cruzes visuais sobre blocos geráveis indicando zonas com nível de iluminação zero propícias ao spawn de monstros.
+- **Mob ESP:** Renderiza caixas 3D (bounding boxes) e etiquetas flutuantes de identificação de mobs inimigos (com escala responsiva adaptativa à distância, Always On Top e filtros granulares por criatura).
 
 ---
 

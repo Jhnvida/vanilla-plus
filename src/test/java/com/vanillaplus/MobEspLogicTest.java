@@ -63,6 +63,31 @@ public class MobEspLogicTest {
         assertTrue(config.mobEspIllager);
         assertTrue(config.mobEspBoss);
         assertTrue(config.mobEspOther);
+        assertTrue(config.mobEspResponsiveText, "Escala responsiva deve vir ativada por padrão");
+        assertEquals(1.0f, config.mobEspTextScale, 0.01f, "Escala padrão de texto deve ser 1.0x");
         assertFalse(config.mobEspPlayers, "Jogadores devem vir desativados por padrão");
+    }
+
+    @Test
+    @DisplayName("Valida responsividade da escala do label conforme a distância")
+    public void testResponsiveLabelScale() {
+        ModConfig config = new ModConfig();
+        config.mobEspResponsiveText = true;
+        config.mobEspTextScale = 1.0f;
+
+        float closeScale = MobEspModule.calculateLabelScale(1.5, config);
+        assertTrue(closeScale <= 0.10f, "Em curta distância a escala do texto deve ser reduzida para evitar ocupar a tela");
+        assertTrue(closeScale >= 0.05f, "Em curta distância o texto ainda deve ser legível e positivo");
+
+        float midScale = MobEspModule.calculateLabelScale(12.0, config);
+        assertTrue(midScale > closeScale, "A escala no espaço 3D deve aumentar com a distância para manter proporção constante na tela");
+
+        float farScale = MobEspModule.calculateLabelScale(35.0, config);
+        assertTrue(farScale <= 0.75f, "A escala deve ser limitada a um teto máximo seguro");
+
+        config.mobEspResponsiveText = false;
+        float fixedScale = MobEspModule.calculateLabelScale(1.5, config);
+        float fixedScaleFar = MobEspModule.calculateLabelScale(35.0, config);
+        assertEquals(fixedScale, fixedScaleFar, 0.001f, "Modo não-responsivo deve manter escala de mundo fixa independente da distância");
     }
 }

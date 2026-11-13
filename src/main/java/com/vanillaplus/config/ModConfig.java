@@ -61,6 +61,8 @@ public class ModConfig {
     public boolean mobEspShowName = true;
     public boolean mobEspShowDistance = true;
     public boolean mobEspShowHealth = true;
+    public boolean mobEspResponsiveText = true;
+    public float mobEspTextScale = 1.0f;
     public com.vanillaplus.modules.render.MobEspColorMode mobEspColorMode = com.vanillaplus.modules.render.MobEspColorMode.WHITE;
     public boolean mobEspCreeper = true;
     public boolean mobEspSkeleton = true;

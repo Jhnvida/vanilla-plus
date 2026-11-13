@@ -510,6 +510,12 @@ public class VanillaPlusDashboardScreen extends Screen {
                         mouseY);
                 sy = drawSubToggle(guiGraphics, sx, sy, sw, "Exibir Vida (HP)", config.mobEspShowHealth, mouseX,
                         mouseY);
+                sy = drawSubToggle(guiGraphics, sx, sy, sw, "Escala Responsiva", config.mobEspResponsiveText, mouseX,
+                        mouseY);
+
+                sy = drawSliderControl(guiGraphics, sx, sy, sw, "mob_esp_scale", "Tamanho do Texto",
+                        String.format(Locale.ROOT, "%.1fx", config.mobEspTextScale),
+                        (float) ((config.mobEspTextScale - 0.5f) / 1.5f), mouseX, mouseY);
 
                 guiGraphics.fill(sx, sy + 2, sx + sw, sy + 3, COLOR_DRAWER_BORDER);
                 sy += 8;
@@ -980,6 +986,20 @@ public class VanillaPlusDashboardScreen extends Screen {
                 }
                 sy += 15;
 
+                if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 14) {
+                    config.mobEspResponsiveText = !config.mobEspResponsiveText;
+                    ConfigManager.save();
+                    return;
+                }
+                sy += 15;
+
+                if (mx >= sx && mx <= sx + sw && my >= sy + 11 && my <= sy + 21) {
+                    activeSliderId = "mob_esp_scale";
+                    updateSliderValue("mob_esp_scale", (float) (mx - sx) / sw);
+                    return;
+                }
+                sy += 25;
+
                 sy += 8;
                 sy += 11;
                 if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + 15) {
@@ -1040,6 +1060,7 @@ public class VanillaPlusDashboardScreen extends Screen {
             case "b_ind_radius" -> config.autoBreedIndicatorRange = Math.round(4 + (ratio * 28.0f));
             case "light_radius" -> config.lightLevelOverlayRadius = Math.round(4 + (ratio * 20.0f));
             case "mob_esp_range" -> config.mobEspRange = Math.round(4 + (ratio * 60.0f));
+            case "mob_esp_scale" -> config.mobEspTextScale = Math.round((0.5f + (ratio * 1.5f)) * 10.0f) / 10.0f;
         }
 
         ConfigManager.save();

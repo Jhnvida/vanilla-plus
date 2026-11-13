@@ -125,14 +125,27 @@ public class MobEspModule extends Module {
             String label = formatEntityLabel(entity, distance, config);
 
             if (!label.isEmpty()) {
-                Vec3 textPos = new Vec3(interpX, box.maxY + 0.25, interpZ);
+                float textScale = calculateLabelScale(distance, config);
+                Vec3 textPos = new Vec3(interpX, box.maxY + 0.15 + (textScale * 0.35), interpZ);
                 Gizmos.billboardText(
                         label,
                         textPos,
-                        TextGizmo.Style.forColorAndCentered(color).withScale(0.85f))
+                        TextGizmo.Style.forColorAndCentered(color).withScale(textScale))
                         .setAlwaysOnTop();
             }
         }
+    }
+
+    public static float calculateLabelScale(double distance, ModConfig config) {
+        float baseMultiplier = Math.clamp(config.mobEspTextScale, 0.4f, 2.5f);
+        if (!config.mobEspResponsiveText) {
+            return 0.30f * baseMultiplier;
+        }
+
+        float factor = 0.026f;
+        float responsive = (float) (distance * factor);
+        float clamped = Math.clamp(responsive, 0.07f, 0.70f);
+        return clamped * baseMultiplier;
     }
 
     public static boolean shouldRenderEntity(LivingEntity entity, ModConfig config) {
